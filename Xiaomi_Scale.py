@@ -70,7 +70,7 @@ class ScanProcessor():
 
 					if unit:
 						print('')
-						self._publish(round(measured, 2, "", ""), unit)
+						self._publish(round(measured, 2), unit, "", "")
 					else:
 						print("Scale is sleeping.")
 
