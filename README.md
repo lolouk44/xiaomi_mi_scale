@@ -21,8 +21,7 @@ C4:D3:8C:12:4C:57 MIBCS
 ## Setup & Configuration:
 ### Running script with Docker:
 
-1. Open `docker-compose.yml` and edit the environment to suit your configuration...
-1. Stand up the container - `docker-compose up -d`
+1. See [https://hub.docker.com/r/lolouk44/xiaomi-mi-scale](https://hub.docker.com/r/lolouk44/xiaomi-mi-scale) for more information
 
 ### Running script directly on your host system:
 
