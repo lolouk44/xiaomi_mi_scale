@@ -8,7 +8,7 @@
 #
 # Thanks to @syssi (https://gist.github.com/syssi/4108a54877406dc231d95514e538bde9) and @prototux (https://github.com/wiecosystem/Bluetooth) for their initial code
 #
-# Make sure you edit MQTT credentials below and user logic/data on lines 117-131
+# Make sure you set your MQTT credentials below and user logic/data through the environment variables
 #
 #############################################################################################
 
@@ -28,12 +28,33 @@ from datetime import datetime
 
 import Xiaomi_Scale_Body_Metrics
 
-MISCALE_MAC = 'REDACTED'
-MQTT_USERNAME = 'REDACTED'
-MQTT_PASSWORD = 'REDACTED'
-MQTT_HOST = 'REDACTED'
-MQTT_PORT = 1883
-MQTT_TIMEOUT = 60
+# Configuraiton...
+MISCALE_MAC = os.getenv('MISCALE_MAC', '')
+MQTT_USERNAME = os.getenv('MQTT_USERNAME', '')
+MQTT_PASSWORD = os.getenv('MQTT_PASSWORD', '')
+MQTT_HOST = os.getenv('MQTT_HOST', '127.0.0.1')
+MQTT_PORT = os.getenv('MQTT_PORT', 1883)
+MQTT_TIMEOUT = os.getenv('MQTT_TIMEOUT', 60)
+MQTT_PREFIX = os.getenv('MQTT_PREFIX', '')
+
+# User Variables...
+
+USER1_GT = int(os.getenv('USER1_GT', '70')) # If the weight is greater than this number, we'll assume that we're weighing User #1
+USER1_SEX = os.getenv('USER1_SEX', 'male')
+USER1_NAME = os.getenv('USER1_NAME', 'David') # Name of the user
+USER1_HEIGHT = int(os.getenv('USER1_HEIGHT', '175')) # Height (in cm) of the user
+USER1_DOB = os.getenv('USER1_DOB', '1988-09-30') # DOB (in yyyy-mm-dd format)
+
+USER2_LT = int(os.getenv('USER2_LT', '55')) # If the weight is less than this number, we'll assume that we're weighing User #2
+USER2_SEX = os.getenv('USER2_SEX', 'female')
+USER2_NAME = os.getenv('USER2_NAME', 'Joanne') # Name of the user
+USER2_HEIGHT = int(os.getenv('USER2_HEIGHT', '155')) # Height (in cm) of the user
+USER2_DOB = os.getenv('USER2_DOB', '1988-10-20') # DOB (in yyyy-mm-dd format)
+
+USER3_SEX = os.getenv('USER3_SEX', 'male')
+USER3_NAME = os.getenv('USER3_NAME', 'Unknown User') # Name of the user
+USER3_HEIGHT = int(os.getenv('USER3_HEIGHT', '175')) # Height (in cm) of the user
+USER3_DOB = os.getenv('USER3_DOB', '1988-01-01') # DOB (in yyyy-mm-dd format)
 
 
 class ScanProcessor():
@@ -114,21 +135,21 @@ class ScanProcessor():
 	def _publish(self, weight, unit, mitdatetime, miimpedance):
 		if not self.connected:
 			raise Exception('not connected to MQTT server')
-		if int(weight) > 72:
-			user="lolo"
-			height=175
-			age=self.GetAge("1900-01-01")
-			sex="male"
-		elif int(weight) < 50:
-			user="kiaan"
-			height=103
-			age=self.GetAge("1900-01-01")
-			sex="male"
+		if int(weight) > USER1_GT:
+			user = USER1_NAME
+			height = USER1_HEIGHT
+			age = self.GetAge(USER1_DOB)
+			sex = USER1_SEX
+		elif int(weight) < USER2_LT:
+			user = USER2_NAME
+			height = USER2_HEIGHT
+			age = self.GetAge(USER2_DOB)
+			sex = USER2_SEX
 		else:
-			user = "div"
-			height=170
-			age=self.GetAge("1900-01-01")
-			sex="female"
+			user = USER3_NAME
+			height = USER3_HEIGHT
+			age = self.GetAge(USER3_DOB)
+			sex = USER3_SEX
 		lib = Xiaomi_Scale_Body_Metrics.bodyMetrics(weight, height, age, sex, 0)
 		message = '{'
 		message += '"Weight":"' + "{:.2f}".format(weight) + '"'
@@ -144,12 +165,12 @@ class ScanProcessor():
 			message += ',"Bone Mass":"' + "{:.2f}".format(lib.getBoneMass()) + '"'
 			message += ',"Muscle Mass":"' + "{:.2f}".format(lib.getMuscleMass()) + '"'
 			message += ',"Protein":"' + "{:.2f}".format(lib.getProteinPercentage()) + '"'
-			self.mqtt_client.publish(user, weight, qos=1, retain=True)
+			self.mqtt_client.publish(MQTT_PREFIX + '/' + user, weight, qos=1, retain=True)
 
 		message += ',"TimeStamp":"' + mitdatetime + '"'
 		message += '}'
-		self.mqtt_client.publish(user+'/weight', message, qos=1, retain=True)
-		print('\tSent data to topic %s: %s' % (user+'/weight', message))
+		self.mqtt_client.publish(MQTT_PREFIX + '/' + user + '/weight', message, qos=1, retain=True)
+		print('\tSent data to topic %s: %s' % (MQTT_PREFIX + '/' + user + '/weight', message))
 
 def main():
 
