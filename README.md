@@ -21,7 +21,11 @@ C4:D3:8C:12:4C:57 MIBCS
 ## Setup & Configuration:
 ### Running script with Docker:
 
-1. Supported platforms: linux/amd64, linux/arm64, linux/arm/v6, linux/arm/v7 - so should cover all Raspberry Pis (^_^)
+1. Supported platforms:
+	1. linux/amd64
+	1. linux/arm64
+	1. linux/arm/v6
+	1. linux/arm/v7
 1. Open `docker-compose.yml` (see below) and edit the environment to suit your configuration... 
 1. Stand up the container - `docker-compose up -d`
 
@@ -68,7 +72,7 @@ services:
       USER3_DOB: "1990-01-01" # DOB (in yyyy-mm-dd format)
 ```
 
-### Running script directly on your host system:
+### Running script directly on your host system (if your platform is not listed/supported):
 
 1. Install python requirements (pip3 install -r requirements.txt)
 1. Open `wrapper.sh` and configure your environment variables to suit your setup.
