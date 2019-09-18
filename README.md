@@ -21,7 +21,52 @@ C4:D3:8C:12:4C:57 MIBCS
 ## Setup & Configuration:
 ### Running script with Docker:
 
-1. See [https://hub.docker.com/r/lolouk44/xiaomi-mi-scale](https://hub.docker.com/r/lolouk44/xiaomi-mi-scale) for more information
+1. Supported platforms: linux/amd64, linux/arm64, linux/arm/v6, linux/arm/v7 - so should cover all Raspberry Pis (^_^)
+1. Open `docker-compose.yml` (see below) and edit the environment to suit your configuration... 
+1. Stand up the container - `docker-compose up -d`
+
+### docker-compose:
+```
+version: '3'
+services:
+
+  mi-scale:
+    image: lolouk44/xiaomi-mi-scale:latest
+    container_name: mi-scale
+    restart: always
+
+    network_mode: host
+    privileged: true
+
+    environment:
+      MISCALE_MAC: 00:00:00:00:00:00 # Mac address of your scale
+      MQTT_HOST: 127.0.0.1  # MQTT Server (defaults to 127.0.0.1)
+      MQTT_PREFIX: miScale
+      # MQTT_USERNAME:        # Username for MQTT server (comment out if not required)
+      # MQTT_PASSWORD:        # Password for MQTT (comment out if not required)
+      # MQTT_PORT:            # Defaults to 1883
+      # MQTT_TIMEOUT: 30      # Defaults to 60
+
+      # Auto-gender selection/config -- This is used to create the calculations such as BMI, Water/Bone Mass etc...
+      # Multi user possible as long as weitghs do not overlap!
+
+      USER1_GT: 70            # If the weight is greater than this number, we'll assume that we're weighing User #1
+      USER1_SEX: male
+      USER1_NAME: Jo          # Name of the user
+      USER1_HEIGHT: 175       # Height (in cm) of the user
+      USER1_DOB: "1990-01-01" # DOB (in yyyy-mm-dd format)
+
+      USER2_LT: 35            # If the weight is less than this number, we'll assume that we're weighing User #2
+      USER2_SEX: female
+      USER2_NAME: Serena      # Name of the user
+      USER2_HEIGHT: 95        # Height (in cm) of the user
+      USER2_DOB: "1990-01-01" # DOB (in yyyy-mm-dd format)
+
+      USER3_SEX: female
+      USER3_NAME: Missy       # Name of the user
+      USER3_HEIGHT: 150       # Height (in cm) of the user
+      USER3_DOB: "1990-01-01" # DOB (in yyyy-mm-dd format)
+```
 
 ### Running script directly on your host system:
 
@@ -64,3 +109,4 @@ Under the `sensor` block, enter as many blocks as users configured in your envir
 
 ## Acknowledgements: 
 Thanks to @syssi (https://gist.github.com/syssi/4108a54877406dc231d95514e538bde9) and @prototux (https://github.com/wiecosystem/Bluetooth) for their initial code
+Special thanks to @ned-kelly (https://github.com/ned-kelly) for his help turning a "simple" python script into a fully fledge docker container
