@@ -52,7 +52,7 @@ services:
       # MQTT_TIMEOUT: 30      # Defaults to 60
 
       # Auto-gender selection/config -- This is used to create the calculations such as BMI, Water/Bone Mass etc...
-      # Multi user possible as long as weitghs do not overlap!
+      # Up to 3 users possible as long as weights do not overlap!
 
       USER1_GT: 70            # If the weight is greater than this number, we'll assume that we're weighing User #1
       USER1_SEX: male
@@ -93,7 +93,7 @@ Under the `sensor` block, enter as many blocks as users configured in your envir
 ```yaml
   - platform: mqtt
     name: "Example Name Weight"
-    state_topic: "miScale/USERS_NAME/weight"
+    state_topic: "miScale/USER_NAME/weight"
     value_template: "{{ value_json['Weight'] }}"
     unit_of_measurement: "kg"
     json_attributes_topic: "miScale/USERS_NAME/weight"
@@ -101,7 +101,7 @@ Under the `sensor` block, enter as many blocks as users configured in your envir
 
   - platform: mqtt
     name: "Example Name BMI"
-    state_topic: "miScale/USERS_NAME/weight"
+    state_topic: "miScale/USER_NAME/weight"
     value_template: "{{ value_json['BMI'] }}"
     icon: mdi:human-pregnant
 
@@ -113,4 +113,5 @@ Under the `sensor` block, enter as many blocks as users configured in your envir
 
 ## Acknowledgements: 
 Thanks to @syssi (https://gist.github.com/syssi/4108a54877406dc231d95514e538bde9) and @prototux (https://github.com/wiecosystem/Bluetooth) for their initial code
+
 Special thanks to @ned-kelly (https://github.com/ned-kelly) for his help turning a "simple" python script into a fully fledge docker container
