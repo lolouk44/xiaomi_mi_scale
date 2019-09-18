@@ -96,7 +96,7 @@ Under the `sensor` block, enter as many blocks as users configured in your envir
     state_topic: "miScale/USER_NAME/weight"
     value_template: "{{ value_json['Weight'] }}"
     unit_of_measurement: "kg"
-    json_attributes_topic: "miScale/USERS_NAME/weight"
+    json_attributes_topic: "miScale/USER_NAME/weight"
     icon: mdi:scale-bathroom
 
   - platform: mqtt
