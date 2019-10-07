@@ -23,9 +23,9 @@ C4:D3:8C:12:4C:57 MIBCS
 
 1. Supported platforms:
 	1. linux/amd64
-	1. linux/arm64
-	1. linux/arm/v6
-	1. linux/arm/v7
+	1. linux/arm64v8
+	1. linux/arm32v6
+	1. linux/arm32v7
 1. Open `docker-compose.yml` (see below) and edit the environment to suit your configuration... 
 1. Stand up the container - `docker-compose up -d`
 
