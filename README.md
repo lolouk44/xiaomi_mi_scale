@@ -72,24 +72,6 @@ services:
     - USER3_DOB="1990-01-01" # DOB (in yyyy-mm-dd format)
 ```
 
-## Home-Assistant Setup:
-Under the `sensor` block, enter as many blocks as users configured in your environment variables:
-
-```yaml
-  - platform: mqtt
-    name: "Example Name Weight"
-    state_topic: "miScale/USER_NAME/weight"
-    value_template: "{{ value_json['Weight'] }}"
-    unit_of_measurement: "kg"
-    json_attributes_topic: "miScale/USER_NAME/weight"
-    icon: mdi:scale-bathroom
-
-  - platform: mqtt
-    name: "Example Name BMI"
-    state_topic: "miScale/USER_NAME/weight"
-    value_template: "{{ value_json['BMI'] }}"
-    icon: mdi:human-pregnant
-```
 
 ### Running script directly on your host system (if your platform is not listed/supported):
 
