@@ -7,6 +7,7 @@ import sys
 from bluepy import btle
 
 MISCALE_MAC = 'XX:XX:XX:XX:XX:XX'
+MISCALE_MAC = 'd4:ab:c8:b9:49:40'
 
 if os.getenv('C', '1') == '0':
     ANSI_RED = ''
@@ -37,25 +38,10 @@ class ScanProcessor():
                        ('' if dev.connectable else '(not connectable)'))
                    , end='')
             for (sdid, desc, data) in dev.getScanData():
-                print('')
-                print ('data:')
-                print (data)
-                if data.startswith('1b18') and sdid == 22:
-                    measunit = data[4:6]
-                    measured = int((data[28:30] + data[26:28]), 16) * 0.01
-                    unit = ''
-
-                    if measunit == "03": unit = 'lbs'
-                    if measunit == "02": unit = 'kg' ; measured = measured / 2
-                    if unit:
-                        print('measured:')
-                        print (measured)
-                        print('unit:')
-                        print (unit)
-                        print('')
-
-                    else:
-                        print("Scale is sleeping.")
+                if sdid == 22:
+                   print('')
+                   print ('data:')
+                   print (data)
 
             if not dev.scanData:
                 print ('\t(no data)')
