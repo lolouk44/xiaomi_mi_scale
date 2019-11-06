@@ -4,7 +4,13 @@ Code to read weight measurements from [Mi Body Composition Scale](https://www.mi
 
 ![Mi Scale](Screenshots/Mi_Scale.png)
 
-Note: Framework is present to also read from Xiaomi Scale V1, although I do not own one to test so code has not been maintained
+
+Also works with [Mi Body Composition Scale 2](https://c.mi.com/thread-2289389-1-0.html) (Model # XMTZC05HM)
+
+![Mi Scale_2](Screenshots/Mi_Scale_2.png)
+
+
+Note: Framework is present to also read from Xiaomi Scale V1, although I do not own one to test so the code has not been maintained
 
 ## Getting the Mac Address of your Scale:
 
