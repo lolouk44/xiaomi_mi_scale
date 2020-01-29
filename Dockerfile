@@ -1,4 +1,4 @@
-FROM python:3.8-rc-alpine
+FROM python:3.8-alpine
 
 WORKDIR /opt/miscale
 COPY src /opt/miscale
@@ -19,11 +19,11 @@ RUN apk update && \
 
 RUN pip install -r requirements.txt
 
-RUN mkdir -p /var/log/cron \
-    && mkdir -m 0644 -p /var/spool/cron/crontabs \
-    && touch /var/log/cron/cron.log \
-    && mkdir -m 0644 -p /etc/cron.d && \
-    echo -e "*/5 * * * * python3 /opt/miscale/Xiaomi_Scale.py\n" >> /var/spool/cron/crontabs/root
+# RUN mkdir -p /var/log/cron \
+    # && mkdir -m 0644 -p /var/spool/cron/crontabs \
+    # && touch /var/log/cron/cron.log \
+    # && mkdir -m 0644 -p /etc/cron.d && \
+    # echo -e "@reboot python3 /opt/miscale/Xiaomi_Scale.py\n" >> /var/spool/cron/crontabs/root
 
 ## Cleanup
 RUN apk del alpine-sdk gcc make tar
