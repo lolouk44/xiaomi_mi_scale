@@ -124,7 +124,7 @@ Special thanks to @ned-kelly (https://github.com/ned-kelly) for his help turning
 + 2019-11-06
   + Initial Commit
 + 2020-01-28
-  + Fixed issue with values in docker-compose seen as strings code (remove the `"`)
+  + Fixed issue with values in docker-compose seen as strings code (removed the `"`)
   + Fixed multi-arch platform builds
   + The script now runs continuously as opposed to once every 5 min, removed cron jobs
   + Fixed issue with string to int conversion (mqtt port, timeout) that used to break the paho-mqtt code
