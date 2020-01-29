@@ -36,7 +36,7 @@ C4:D3:8C:12:4C:57 MIBCS
 1. Stand up the container - `docker-compose up -d`
 
 ### docker-compose:
-```
+```yaml
 version: '3'
 services:
 
