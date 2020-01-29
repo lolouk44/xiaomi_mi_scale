@@ -4,7 +4,13 @@ Code to read weight measurements from [Mi Body Composition Scale](https://www.mi
 
 ![Mi Scale](Screenshots/Mi_Scale.png)
 
-Note: Framework is present to also read from Xiaomi Scale V1, although I do not own one to test so code has not been maintained
+
+Also works with [Mi Body Composition Scale 2](https://c.mi.com/thread-2289389-1-0.html) (Model # XMTZC05HM)
+
+![Mi Scale_2](Screenshots/Mi_Scale_2.png)
+
+
+Note: Framework is present to also read from Xiaomi Scale V1, although I do not own one to test so the code has not been maintained
 
 ## Getting the Mac Address of your Scale:
 
@@ -23,9 +29,9 @@ C4:D3:8C:12:4C:57 MIBCS
 
 1. Supported platforms:
 	1. linux/amd64
-	1. linux/arm64
-	1. linux/arm/v6
-	1. linux/arm/v7
+	1. linux/arm32v6
+	1. linux/arm32v7
+	1. linux/arm64v8
 1. Open `docker-compose.yml` (see below) and edit the environment to suit your configuration... 
 1. Stand up the container - `docker-compose up -d`
 
@@ -43,13 +49,13 @@ services:
     privileged: true
 
     environment:
-      MISCALE_MAC: 00:00:00:00:00:00 # Mac address of your scale
-      MQTT_HOST: 127.0.0.1  # MQTT Server (defaults to 127.0.0.1)
-      MQTT_PREFIX: miScale
-      # MQTT_USERNAME:        # Username for MQTT server (comment out if not required)
-      # MQTT_PASSWORD:        # Password for MQTT (comment out if not required)
-      # MQTT_PORT:            # Defaults to 1883
-      # MQTT_TIMEOUT: 30      # Defaults to 60
+    - MISCALE_MAC=00:00:00:00:00:00 # Mac address of your scale
+    - MQTT_HOST=127.0.0.1  # MQTT Server (defaults to 127.0.0.1)
+    - MQTT_PREFIX=miScale
+    - MQTT_USERNAME=       # Username for MQTT server (comment out if not required)
+    - MQTT_PASSWORD=       # Password for MQTT (comment out if not required)
+    - MQTT_PORT=           # Defaults to 1883
+    - MQTT_TIMEOUT=30      # Defaults to 60
 
       # Auto-gender selection/config -- This is used to create the calculations such as BMI, Water/Bone Mass etc...
       # Up to 3 users possible as long as weights do not overlap!
@@ -72,6 +78,7 @@ services:
       USER3_DOB: 1990-01-01 # DOB (in yyyy-mm-dd format)
 ```
 
+
 ### Running script directly on your host system (if your platform is not listed/supported):
 
 1. Install python requirements (pip3 install -r requirements.txt)
@@ -82,7 +89,7 @@ services:
 @reboot bash /path/to/wrapper.sh
 ```
 
-**NOTE**: Althought once started the script runs continuously, it may take a few seconds for the data to be retrieved, computed and sent via mqtt.
+**NOTE**: Although once started the script runs continuously, it may take a few seconds for the data to be retrieved, computed and sent via mqtt.
 
 ## Home-Assistant Setup:
 Under the `sensor` block, enter as many blocks as users configured in your environment variables:
