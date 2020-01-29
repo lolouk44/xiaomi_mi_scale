@@ -2,14 +2,6 @@
 
 export MISCALE_MAC=00:00:00:00:00:00 # Mac address of your scale
 export MQTT_PREFIX=miScale
-#export MQTT_HOST=<YOUR-IP>  # MQTT Server (defaults to 127.0.0.1)
-#export MQTT_USERNAME=        # Username for MQTT server (comment out if not required)
-#export MQTT_PASSWORD=        # Password for MQTT (comment out if not required)
-#export MQTT_PORT=            # Defaults to 1883
-#export MQTT_TIMEOUT=30       # Defaults to 60
-
-# Auto-gender selection/config -- This is used to create the calculations such as BMI, Water/Bone Mass etc...
-# Multi user possible as long as weitghs do not overlap!
 
 export USER1_GT=70            # If the weight is greater than this number, we'll assume that we're weighing User #1
 export USER1_SEX=male
