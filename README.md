@@ -58,18 +58,18 @@ services:
       USER1_SEX: male
       USER1_NAME: Jo          # Name of the user
       USER1_HEIGHT: 175       # Height (in cm) of the user
-      USER1_DOB: "1990-01-01" # DOB (in yyyy-mm-dd format)
+      USER1_DOB: 1990-01-01 # DOB (in yyyy-mm-dd format)
 
       USER2_LT: 35            # If the weight is less than this number, we'll assume that we're weighing User #2
       USER2_SEX: female
       USER2_NAME: Serena      # Name of the user
       USER2_HEIGHT: 95        # Height (in cm) of the user
-      USER2_DOB: "1990-01-01" # DOB (in yyyy-mm-dd format)
+      USER2_DOB: 1990-01-01 # DOB (in yyyy-mm-dd format)
 
       USER3_SEX: female
       USER3_NAME: Missy       # Name of the user
       USER3_HEIGHT: 150       # Height (in cm) of the user
-      USER3_DOB: "1990-01-01" # DOB (in yyyy-mm-dd format)
+      USER3_DOB: 1990-01-01 # DOB (in yyyy-mm-dd format)
 ```
 
 ### Running script directly on your host system (if your platform is not listed/supported):
@@ -79,13 +79,10 @@ services:
 1. Add a cron-tab entry to wrapper like so:
 
 ```sh
-*/5 * * * * bash /path/to/wrapper.sh
+@reboot bash /path/to/wrapper.sh
 ```
 
-**NOTE**: It's best to schedule via crontab at most, every 5 min (so as not to drain the battery on your scale):
-```
-*/5 * * * * python3 /path-to-script/Xiaomi_Scale.py
-```
+**NOTE**: Althought once started the script runs continuously, it may take a few seconds for the data to be retrieved, computed and sent via mqtt.
 
 ## Home-Assistant Setup:
 Under the `sensor` block, enter as many blocks as users configured in your environment variables:
@@ -115,3 +112,16 @@ Under the `sensor` block, enter as many blocks as users configured in your envir
 Thanks to @syssi (https://gist.github.com/syssi/4108a54877406dc231d95514e538bde9) and @prototux (https://github.com/wiecosystem/Bluetooth) for their initial code
 
 Special thanks to @ned-kelly (https://github.com/ned-kelly) for his help turning a "simple" python script into a fully fledge docker container
+
+## Updates log: 
++ 2019-11-06
+  + Initial Commit
++ 2020-01-28
+  + Fixed issue with values in docker-compose seen as strings code (remove the `"`)
+  + Fixed multi-arch platform builds
+  + The script now runs continuously as opposed to once every 5 min, removed cron jobs
+  + Fixed issue with string to int conversion (mqtt port, timeout) that used to break the paho-mqtt code
+  + Updated the biometrics library with latest version from (https://github.com/wiecosystem/Bluetooth)
+  + Added logging to docker console
+  + Bumped paho-mqtt to V1.5.0
+  + Bumped python to 3.8
