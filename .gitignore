@@ -1,8 +1,0 @@
-# System Files
-.DS_Store
-Thumbs.db
-Desktop.ini
-desktop.ini
-
-# Docker exported images
-*.docker
