@@ -14,11 +14,11 @@ Note: Framework is present to also read from Xiaomi Scale V1, although I do not 
 
 ## Getting the Mac Address of your Scale:
 
-1. Retrieve the scale's MAC Address (you can identify your scale by looking for `MIBCS` entries) using this command:
+1. Retrieve the scale's MAC Address using this command:
 ```
-$ sudo hcitool lescan
+$ sudo hcitool lescan | grep -i MIBCS
+
 LE Scan ...
-F8:04:33:AF:AB:A2 [TV] UE48JU6580
 C4:D3:8C:12:4C:57 MIBCS
 [...]
 ```
