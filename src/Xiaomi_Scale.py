@@ -94,7 +94,7 @@ class ScanProcessor():
 					ctrlByte1 = data2[1]
 					isStabilized = ctrlByte1 & (1<<5)
 					hasImpedance = ctrlByte1 & (1<<1)
-					
+
 					measunit = data[4:6]
 					measured = int((data[28:30] + data[26:28]), 16) * 0.01
 					unit = ''
@@ -158,7 +158,7 @@ class ScanProcessor():
 			message += ',"Muscle Mass":"' + "{:.2f}".format(lib.getMuscleMass()) + '"'
 			message += ',"Protein":"' + "{:.2f}".format(lib.getProteinPercentage()) + '"'
 
-		message += ',"TimeStamp":"' + mitdatetime + '"'
+		message += ',"TimeStamp":"' + str(mitdatetime) + '"'
 		message += '}'
 		self.mqtt_client.publish(MQTT_PREFIX + '/' + user + '/weight', message, qos=1, retain=True)
 		sys.stdout.write('Sent data to topic %s: %s' % (MQTT_PREFIX + '/' + user + '/weight', message + '\n'))
