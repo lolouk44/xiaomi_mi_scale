@@ -132,3 +132,6 @@ Special thanks to @ned-kelly (https://github.com/ned-kelly) for his help turning
   + Added logging to docker console
   + Bumped paho-mqtt to V1.5.0
   + Bumped python to 3.8
++ 2020-02-03
+  + Cleanup - removal of unused variables
+  + fixed issue with V1 scale, thanks @benuhx (https://github.com/benuhx)
