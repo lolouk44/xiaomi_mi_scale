@@ -84,23 +84,22 @@ class ScanProcessor():
 					if unit:
 						if OLD_MEASURE != round(measured, 2):
 							print('')
-							self._publish(round(measured, 2), unit, 0, "", "")
+							self._publish(round(measured, 2), unit, str(datetime.today().strftime('%Y-%m-%d-%H:%M:%S')), "", "")
 							OLD_MEASURE = round(measured, 2)
 
 				### Xiaomi V2 Scale ###
 				if data.startswith('1b18') and sdid == 22:
 					data2 = bytes.fromhex(data[4:])
-					ctrlByte0 = data2[0]
 					ctrlByte1 = data2[1]
 					isStabilized = ctrlByte1 & (1<<5)
 					hasImpedance = ctrlByte1 & (1<<1)
-					
+
 					measunit = data[4:6]
 					measured = int((data[28:30] + data[26:28]), 16) * 0.01
 					unit = ''
 					if measunit == "03": unit = 'lbs'
 					if measunit == "02": unit = 'kg' ; measured = measured / 2
-					mitdatetime = datetime.strptime(str(int((data[10:12] + data[8:10]), 16)) + " " + str(int((data[12:14]), 16)) +" "+ str(int((data[14:16]), 16)) +" "+ str(int((data[16:18]), 16)) +" "+ str(int((data[18:20]), 16)) +" "+ str(int((data[20:22]), 16)), "%Y %m %d %H %M %S")
+					#mitdatetime = datetime.strptime(str(int((data[10:12] + data[8:10]), 16)) + " " + str(int((data[12:14]), 16)) +" "+ str(int((data[14:16]), 16)) +" "+ str(int((data[16:18]), 16)) +" "+ str(int((data[18:20]), 16)) +" "+ str(int((data[20:22]), 16)), "%Y %m %d %H %M %S")
 					miimpedance = str(int((data[24:26] + data[22:24]), 16))
 					if unit and isStabilized:
 						if OLD_MEASURE != round(measured, 2) + int(miimpedance):
