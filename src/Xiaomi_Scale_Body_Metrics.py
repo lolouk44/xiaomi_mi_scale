@@ -1,4 +1,5 @@
 from math import floor
+import sys
 from body_scales import bodyScales
 
 class bodyMetrics:
@@ -17,15 +18,15 @@ class bodyMetrics:
             exit()
         elif weight < 10 or weight > 200:
             print("Weight is either too low or too high (limits: <10kg and >200kg) or scale is sleeping")
-            sys.stderr.write('Weight is above 10kg or below 200kg or scale is sleeping\n') 
+            sys.stderr.write('Weight is above 10kg or below 200kg or scale is sleeping\n')
             exit()
         elif age > 99:
             print("Age is too high (limit >99 years) or scale is sleeping")
-            sys.stderr.write('Age is above 99 years or scale is sleeping\n') 
+            sys.stderr.write('Age is above 99 years or scale is sleeping\n')
             exit()
         elif impedance > 3000:
             print("Impedance is above 3000ohm or scale is sleeping")
-            sys.stderr.write('Impedance is above 3000ohm or scale is sleeping\n') 
+            sys.stderr.write('Impedance is above 3000ohm or scale is sleeping\n')
             exit()
 
     # Set the value to a boundary if it overflows

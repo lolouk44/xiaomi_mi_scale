@@ -95,11 +95,11 @@ class bodyScore:
                 return self.getMalus(self.bodyfat, scale[3], scale[2], 20, 10) + 10.0
 
             # High part of normal fat
-            elif self.bodyfat <= normal[2]:
+            elif self.bodyfat <= scale[2]:
                 return self.getMalus(self.bodyfat, scale[2], best, 3, 9) + 3.0
 
             # Very low in fat
-            elif self.bodyfat < normal[0]:
+            elif self.bodyfat < scale[0]:
                 return self.getMalus(self.bodyfat, 1.0, scale[0], 3, 10) + 3.0
 
 
