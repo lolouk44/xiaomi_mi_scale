@@ -60,22 +60,22 @@ services:
       # Auto-gender selection/config -- This is used to create the calculations such as BMI, Water/Bone Mass etc...
       # Up to 3 users possible as long as weights do not overlap!
 
-      USER1_GT=70            # If the weight is greater than this number, we'll assume that we're weighing User #1
-      USER1_SEX=male
-      USER1_NAME=Jo          # Name of the user
-      USER1_HEIGHT=175       # Height (in cm) of the user
-      USER1_DOB=1990-01-01   # DOB (in yyyy-mm-dd format)
+    - USER1_GT=70            # If the weight is greater than this number, we'll assume that we're weighing User #1
+    - USER1_SEX=male
+    - USER1_NAME=Jo          # Name of the user
+    - USER1_HEIGHT=175       # Height (in cm) of the user
+    - USER1_DOB=1990-01-01   # DOB (in yyyy-mm-dd format)
 
-      USER2_LT=35            # If the weight is less than this number, we'll assume that we're weighing User #2
-      USER2_SEX=female
-      USER2_NAME=Serena      # Name of the user
-      USER2_HEIGHT=95        # Height (in cm) of the user
-      USER2_DOB=1990-01-01   # DOB (in yyyy-mm-dd format)
+    - USER2_LT=35            # If the weight is less than this number, we'll assume that we're weighing User #2
+    - USER2_SEX=female
+    - USER2_NAME=Serena      # Name of the user
+    - USER2_HEIGHT=95        # Height (in cm) of the user
+    - USER2_DOB=1990-01-01   # DOB (in yyyy-mm-dd format)
 
-      USER3_SEX=female
-      USER3_NAME=Missy       # Name of the user
-      USER3_HEIGHT=150       # Height (in cm) of the user
-      USER3_DOB=1990-01-01   # DOB (in yyyy-mm-dd format)
+    - USER3_SEX=female
+    - USER3_NAME=Missy       # Name of the user
+    - USER3_HEIGHT=150       # Height (in cm) of the user
+    - USER3_DOB=1990-01-01   # DOB (in yyyy-mm-dd format)
 ```
 
 
