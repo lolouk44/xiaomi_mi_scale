@@ -35,7 +35,8 @@ MQTT_PASSWORD = os.getenv('MQTT_PASSWORD', '')
 MQTT_HOST = os.getenv('MQTT_HOST', '127.0.0.1')
 MQTT_PORT = int(os.getenv('MQTT_PORT', 1883))
 MQTT_TIMEOUT = int(os.getenv('MQTT_TIMEOUT', 60))
-MQTT_PREFIX = os.getenv('MQTT_PREFIX', '')
+MQTT_PREFIX = os.getenv('MQTT_PREFIX', 'miscale')
+TIME_INTERVAL = os.getenv('TIME_INTERVAL, '30')
 OLD_MEASURE = ''
 
 # User Variables...
@@ -156,6 +157,8 @@ class ScanProcessor():
 			message += ',"Bone Mass":"' + "{:.2f}".format(lib.getBoneMass()) + '"'
 			message += ',"Muscle Mass":"' + "{:.2f}".format(lib.getMuscleMass()) + '"'
 			message += ',"Protein":"' + "{:.2f}".format(lib.getProteinPercentage()) + '"'
+			#message += ',"Body Type":"' + str(lib.getBodyTypeScale(getBodyType())) + '"'
+			#message += ',"Metabolic Age":"' + str(lib.getMetabolicAge()) + '"'
 
 		message += ',"TimeStamp":"' + mitdatetime + '"'
 		message += '}'
@@ -169,12 +172,12 @@ def main():
 	sys.stdout.write('Starting Xiaomi mi Scale...\n')
 	scanner = btle.Scanner().withDelegate(ScanProcessor())
 	while True:
-		# try:
-		scanner.scan(5)
-		# except:
-			# sys.stderr.write("Error while running the script, continuing. If you see this message too often/constantly there is probably a real issue...\n")
-			# pass
-		time.sleep(1)
+		try:
+			scanner.scan(5, passive=True) # Adding passive=True to try and fix issues on RPi devices
+		except:
+			sys.stderr.write("Error while running the script, continuing. If you see this message too often/constantly there is probably a real issue...\n")
+			pass
+		time.sleep(TIME_INTERVAL)
 
 if __name__ == "__main__":
 	main()

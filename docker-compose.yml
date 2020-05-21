@@ -2,7 +2,8 @@ version: '3'
 services:
 
   mi-scale:
-    image: lolouk44/xiaomi-mi-scale:latest
+    build: .
+    #image: lolouk44/xiaomi-mi-scale:latest
     container_name: mi-scale
     restart: always
 
@@ -12,11 +13,12 @@ services:
     environment:
     - MISCALE_MAC=d4:00:00:00:00:00 # Mac address of your scale
     - MQTT_HOST=127.0.0.1 # MQTT Server (defaults to 127.0.0.1)
-    - MQTT_PREFIX=miScale
+    - MQTT_PREFIX=miscale # MQTT Prefix, defaults to miscale
     - MQTT_USERNAME=      # Username for MQTT server (comment out if not required)
     - MQTT_PASSWORD=      # Password for MQTT (comment out if not required)
     - MQTT_PORT=1883      # Defaults to 1883
     - MQTT_TIMEOUT=60     # Defaults to 60
+    - TIME_INTERVAL=30     # Time in sec between each query to the scale, to allow other applications to use the Bluetooth module. Defaults to 30
 
       # Auto-gender selection/config -- This is used to create the calculations such as BMI, Water/Bone Mass etc...
       # Up to 3 users possible as long as weights do not overlap!
