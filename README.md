@@ -56,6 +56,7 @@ services:
     - MQTT_PASSWORD=       # Password for MQTT (comment out if not required)
     - MQTT_PORT=           # Defaults to 1883
     - MQTT_TIMEOUT=30      # Defaults to 60
+    - TIME_INTERVAL=30     # Time in sec between each query to the scale, to allow other applications to use the Bluetooth module. Defaults to 30
 
       # Auto-gender selection/config -- This is used to create the calculations such as BMI, Water/Bone Mass etc...
       # Up to 3 users possible as long as weights do not overlap!
