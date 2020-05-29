@@ -120,19 +120,3 @@ Under the `sensor` block, enter as many blocks as users configured in your envir
 Thanks to @syssi (https://gist.github.com/syssi/4108a54877406dc231d95514e538bde9) and @prototux (https://github.com/wiecosystem/Bluetooth) for their initial code
 
 Special thanks to @ned-kelly (https://github.com/ned-kelly) for his help turning a "simple" python script into a fully fledge docker container
-
-## Updates log: 
-+ 2019-11-06
-  + Initial Commit
-+ 2020-01-28
-  + Fixed issue with values in docker-compose seen as strings code (removed the `"`)
-  + Fixed multi-arch platform builds
-  + The script now runs continuously as opposed to once every 5 min, removed cron jobs
-  + Fixed issue with string to int conversion (mqtt port, timeout) that used to break the paho-mqtt code
-  + Updated the biometrics library with latest version from (https://github.com/wiecosystem/Bluetooth)
-  + Added logging to docker console
-  + Bumped paho-mqtt to V1.5.0
-  + Bumped python to 3.8
-+ 2020-02-03
-  + Cleanup - removal of unused variables
-  + fixed issue with V1 scale, thanks [@benuhx](https://github.com/benuhx)
