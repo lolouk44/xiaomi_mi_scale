@@ -36,7 +36,6 @@ MQTT_USERNAME = os.getenv('MQTT_USERNAME', 'username')
 MQTT_PASSWORD = os.getenv('MQTT_PASSWORD', None)
 MQTT_HOST = os.getenv('MQTT_HOST', '127.0.0.1')
 MQTT_PORT = int(os.getenv('MQTT_PORT', 1883))
-MQTT_TIMEOUT = int(os.getenv('MQTT_TIMEOUT', 60))
 MQTT_PREFIX = os.getenv('MQTT_PREFIX', 'miscale')
 TIME_INTERVAL = int(os.getenv('TIME_INTERVAL', 30))
 OLD_MEASURE = ''
