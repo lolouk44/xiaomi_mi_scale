@@ -39,7 +39,6 @@ MQTT_PORT = int(os.getenv('MQTT_PORT', 1883))
 MQTT_PREFIX = os.getenv('MQTT_PREFIX', 'miscale')
 TIME_INTERVAL = int(os.getenv('TIME_INTERVAL', 30))
 OLD_MEASURE = ''
-MQTT_CONNECTED = False
 
 # User Variables...
 USER1_GT = int(os.getenv('USER1_GT', '70')) # If the weight is greater than this number, we'll assume that we're weighing User #1
@@ -83,7 +82,6 @@ class ScanProcessor():
                     if measunit.startswith(('22', 'a2')): unit = 'kg' ; measured = measured / 2
                     if unit:
                         if OLD_MEASURE != round(measured, 2):
-                            print('')
                             self._publish(round(measured, 2), unit, str(datetime.today().strftime('%Y-%m-%d-%H:%M:%S')), "", "")
                             OLD_MEASURE = round(measured, 2)
 
@@ -103,12 +101,9 @@ class ScanProcessor():
                     miimpedance = str(int((data[24:26] + data[22:24]), 16))
                     if unit and isStabilized:
                         if OLD_MEASURE != round(measured, 2) + int(miimpedance):
-                            print('')
                             self._publish(round(measured, 2), unit, str(datetime.today().strftime('%Y-%m-%d-%H:%M:%S')), hasImpedance, miimpedance)
                             OLD_MEASURE = round(measured, 2) + int(miimpedance)
 
-            else:
-                print ('\t(no data)')
 
     def _publish(self, weight, unit, mitdatetime, hasImpedance, miimpedance):
         if int(weight) > USER1_GT:
@@ -148,36 +143,37 @@ class ScanProcessor():
         message += ',"TimeStamp":"' + mitdatetime + '"'
         message += '}'
         try:
-            sys.stdout.write('Sent data to topic %s: %s' % (MQTT_PREFIX + '/' + user + '/weight', message + '\n'))
+            sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Publishing data to topic {MQTT_PREFIX + '/' + user + '/weight'}: {message}\n")
             publish.single(
                 MQTT_PREFIX + '/' + user + '/weight',
                 message,
-                qos=1,
+                # qos=1, #Removed qos=1 as incorrect connection details will result in the client waiting for ack from broker
                 retain=True,
                 hostname=MQTT_HOST,
                 port=MQTT_PORT,
                 auth={'username':MQTT_USERNAME, 'password':MQTT_PASSWORD}
             )
-        except:
-          sys.stdout.write('Could not publish to MQTT\n')
-          raise
+            sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Data Published ...\n")
+        except Exception as error:
+            sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Could not publish to MQTT: {error}\n")
+            raise
 
 def main():
     sys.stdout.write(' \n')
     sys.stdout.write('-------------------------------------\n')
-    sys.stdout.write('Starting Xiaomi mi Scale...\n')
+    sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Starting Xiaomi mi Scale...\n")
     BluetoothFailCounter = 0
     while True:
         try:
             scanner = btle.Scanner().withDelegate(ScanProcessor())
             scanner.scan(5) # Adding passive=True to try and fix issues on RPi devices
         except BTLEDisconnectError as error:
-            sys.stderr.write(f"btle disconnected: {error}\n")
+            sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - btle disconnected: {error}\n")
             pass
         except BTLEManagementError as error:
-            sys.stderr.write(f"Bluetooth connection error: {error}\n")
+            sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Bluetooth connection error: {error}\n")
             if BluetoothFailCounter >= 4:
-                sys.stderr.write(f"5+ Bluetooth connection errors. Resetting Bluetooth...\n")
+                sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - 5+ Bluetooth connection errors. Resetting Bluetooth...\n")
                 cmd = 'hciconfig hci0 reset'
                 ps = subprocess.Popen(cmd, shell=True)
                 time.sleep(30)
@@ -185,8 +181,8 @@ def main():
             else:
                 BluetoothFailCounter+=1
             pass
-        except:
-            sys.stderr.write("Error while running the script, continuing...\n")
+        except Exception as error:
+            sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Error while running the script: {error}\n")
             pass
         else:
             BluetoothFailCounter = 0
