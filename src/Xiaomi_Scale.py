@@ -25,15 +25,15 @@ import sys
 import subprocess
 from bluepy import btle
 from bluepy.btle import Scanner, BTLEDisconnectError, BTLEManagementError, DefaultDelegate
-import paho.mqtt.client as mqtt
+import paho.mqtt.publish as publish
 from datetime import datetime
 
 import Xiaomi_Scale_Body_Metrics
 
 # Configuraiton...
 MISCALE_MAC = os.getenv('MISCALE_MAC', '')
-MQTT_USERNAME = os.getenv('MQTT_USERNAME', '')
-MQTT_PASSWORD = os.getenv('MQTT_PASSWORD', '')
+MQTT_USERNAME = os.getenv('MQTT_USERNAME', 'username')
+MQTT_PASSWORD = os.getenv('MQTT_PASSWORD', None)
 MQTT_HOST = os.getenv('MQTT_HOST', '127.0.0.1')
 MQTT_PORT = int(os.getenv('MQTT_PORT', 1883))
 MQTT_TIMEOUT = int(os.getenv('MQTT_TIMEOUT', 60))
@@ -68,12 +68,7 @@ class ScanProcessor():
         return abs((d2 - d1).days)/365
 
     def __init__(self):
-        global MQTT_CONNECTED
         DefaultDelegate.__init__(self)
-        if not MQTT_CONNECTED:
-            self.mqtt_client = None
-            self._start_client()
-
 
     def handleDiscovery(self, dev, isNewDev, isNewData):
         global OLD_MEASURE
@@ -113,32 +108,10 @@ class ScanProcessor():
                             self._publish(round(measured, 2), unit, str(datetime.today().strftime('%Y-%m-%d-%H:%M:%S')), hasImpedance, miimpedance)
                             OLD_MEASURE = round(measured, 2) + int(miimpedance)
 
-            if not dev.scanData:
+            else:
                 print ('\t(no data)')
 
-    def _start_client(self):
-        global MQTT_CONNECTED
-        self.mqtt_client = mqtt.Client()
-        self.mqtt_client.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
-
-        def _on_connect(client, _, flags, return_code):
-            global MQTT_CONNECTED
-            MQTT_CONNECTED = True
-            loop_flag = 0
-            sys.stdout.write("MQTT connection: %s\n" % mqtt.connack_string(return_code))
-
-        self.mqtt_client.on_connect = _on_connect
-        self.mqtt_client.connect(MQTT_HOST, MQTT_PORT, MQTT_TIMEOUT)
-        self.mqtt_client.loop_start()
-
-        while not MQTT_CONNECTED: # wait for MQTT connecting Ack
-            time.sleep(.01)
-
     def _publish(self, weight, unit, mitdatetime, hasImpedance, miimpedance):
-        global MQTT_CONNECTED
-        if not MQTT_CONNECTED:
-            sys.stderr.write('Not connected to MQTT server\n')
-            exit()
         if int(weight) > USER1_GT:
             user = USER1_NAME
             height = USER1_HEIGHT
@@ -176,16 +149,21 @@ class ScanProcessor():
         message += ',"TimeStamp":"' + mitdatetime + '"'
         message += '}'
         try:
-          self.mqtt_client.publish(MQTT_PREFIX + '/' + user + '/weight', message, qos=1, retain=True)
-          sys.stdout.write('Sent data to topic %s: %s' % (MQTT_PREFIX + '/' + user + '/weight', message + '\n'))
+            sys.stdout.write('Sent data to topic %s: %s' % (MQTT_PREFIX + '/' + user + '/weight', message + '\n'))
+            publish.single(
+                MQTT_PREFIX + '/' + user + '/weight',
+                message,
+                qos=1,
+                retain=True,
+                hostname=MQTT_HOST,
+                port=MQTT_PORT,
+                auth={'username':MQTT_USERNAME, 'password':MQTT_PASSWORD}
+            )
         except:
-          sys.stdout.write('Could not publish to MQTT, Disconnecting...\n')
-          MQTT_CONNECTED = False
-          self.mqtt_client.disconnect()
-          pass
+          sys.stdout.write('Could not publish to MQTT\n')
+          raise
 
 def main():
-
     sys.stdout.write(' \n')
     sys.stdout.write('-------------------------------------\n')
     sys.stdout.write('Starting Xiaomi mi Scale...\n')
