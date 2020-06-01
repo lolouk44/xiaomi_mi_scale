@@ -32,7 +32,7 @@ C4:D3:8C:12:4C:57 MIBCS
 	1. linux/arm32v6
 	1. linux/arm32v7
 	1. linux/arm64v8
-1. Open `docker-compose.yml` (see below) and edit the environment to suit your configuration... 
+1. Open `docker-compose.yml` (see below) and edit the environment to suit your configuration...
 1. Stand up the container - `docker-compose up -d`
 
 ### docker-compose:
@@ -55,7 +55,6 @@ services:
     - MQTT_USERNAME=       # Username for MQTT server (comment out if not required)
     - MQTT_PASSWORD=       # Password for MQTT (comment out if not required)
     - MQTT_PORT=           # Defaults to 1883
-    - MQTT_TIMEOUT=30      # Defaults to 60
     - TIME_INTERVAL=30     # Time in sec between each query to the scale, to allow other applications to use the Bluetooth module. Defaults to 30
 
       # Auto-gender selection/config -- This is used to create the calculations such as BMI, Water/Bone Mass etc...
@@ -116,7 +115,7 @@ Under the `sensor` block, enter as many blocks as users configured in your envir
 
 ![Mi Scale](Screenshots/HA_Lovelace_Card_Details.png)
 
-## Acknowledgements: 
+## Acknowledgements:
 Thanks to @syssi (https://gist.github.com/syssi/4108a54877406dc231d95514e538bde9) and @prototux (https://github.com/wiecosystem/Bluetooth) for their initial code
 
 Special thanks to @ned-kelly (https://github.com/ned-kelly) for his help turning a "simple" python script into a fully fledge docker container
