@@ -25,30 +25,30 @@ class bodyScales:
         # The included tables where quite strange, maybe bogus, replaced them with better ones...
         if self.scaleType == 'xiaomi':
             scales = [
-                {'min': 0, 'max': 11, 'female': [12.0, 21.0, 30.0, 34.0], 'male': [7.0, 16.0, 25.0, 30.0]},
-                {'min': 12, 'max': 13, 'female': [15.0, 24.0, 33.0, 37.0], 'male': [7.0, 16.0, 25.0, 30.0]},
-                {'min': 14, 'max': 15, 'female': [18.0, 27.0, 36.0, 40.0], 'male': [7.0, 16.0, 25.0, 30.0]},
-                {'min': 16, 'max': 17, 'female': [20.0, 28.0, 37.0, 41.0], 'male': [7.0, 16.0, 25.0, 30.0]},
-                {'min': 18, 'max': 39, 'female': [21.0, 28.0, 35.0, 40.0], 'male': [11.0, 17.0, 22.0, 27.0]},
-                {'min': 40, 'max': 59, 'female': [22.0, 29.0, 36.0, 41.0], 'male': [12.0, 18.0, 23.0, 28.0]},
+                {'min': 0, 'max': 12, 'female': [12.0, 21.0, 30.0, 34.0], 'male': [7.0, 16.0, 25.0, 30.0]},
+                {'min': 12, 'max': 14, 'female': [15.0, 24.0, 33.0, 37.0], 'male': [7.0, 16.0, 25.0, 30.0]},
+                {'min': 14, 'max': 16, 'female': [18.0, 27.0, 36.0, 40.0], 'male': [7.0, 16.0, 25.0, 30.0]},
+                {'min': 16, 'max': 18, 'female': [20.0, 28.0, 37.0, 41.0], 'male': [7.0, 16.0, 25.0, 30.0]},
+                {'min': 18, 'max': 40, 'female': [21.0, 28.0, 35.0, 40.0], 'male': [11.0, 17.0, 22.0, 27.0]},
+                {'min': 40, 'max': 60, 'female': [22.0, 29.0, 36.0, 41.0], 'male': [12.0, 18.0, 23.0, 28.0]},
                 {'min': 60, 'max': 100, 'female': [23.0, 30.0, 37.0, 42.0], 'male': [14.0, 20.0, 25.0, 30.0]},
             ]
 
         elif self.scaleType == 'holtek':
             scales = [
-                {'min': 0, 'max': 20, 'female': [18, 23, 30, 35], 'male': [8, 14, 21, 25]},
-                {'min': 21, 'max': 25, 'female': [19, 24, 30, 35], 'male': [10, 15, 22, 26]},
-                {'min': 26, 'max': 30, 'female': [20, 25, 31, 36], 'male': [11, 16, 21, 27]},
-                {'min': 31, 'max': 35, 'female': [21, 26, 33, 36], 'male': [13, 17, 25, 28]},
-                {'min': 46, 'max': 40, 'female': [22, 27, 34, 37], 'male': [15, 20, 26, 29]},
-                {'min': 41, 'max': 45, 'female': [23, 28, 35, 38], 'male': [16, 22, 27, 30]},
-                {'min': 46, 'max': 50, 'female': [24, 30, 36, 38], 'male': [17, 23, 29, 31]},
-                {'min': 51, 'max': 55, 'female': [26, 31, 36, 39], 'male': [19, 25, 30, 33]},
+                {'min': 0, 'max': 21, 'female': [18, 23, 30, 35], 'male': [8, 14, 21, 25]},
+                {'min': 21, 'max': 26, 'female': [19, 24, 30, 35], 'male': [10, 15, 22, 26]},
+                {'min': 26, 'max': 31, 'female': [20, 25, 31, 36], 'male': [11, 16, 21, 27]},
+                {'min': 31, 'max': 36, 'female': [21, 26, 33, 36], 'male': [13, 17, 25, 28]},
+                {'min': 36, 'max': 41, 'female': [22, 27, 34, 37], 'male': [15, 20, 26, 29]},
+                {'min': 41, 'max': 46, 'female': [23, 28, 35, 38], 'male': [16, 22, 27, 30]},
+                {'min': 46, 'max': 51, 'female': [24, 30, 36, 38], 'male': [17, 23, 29, 31]},
+                {'min': 51, 'max': 56, 'female': [26, 31, 36, 39], 'male': [19, 25, 30, 33]},
                 {'min': 56, 'max': 100, 'female': [27, 32, 37, 40], 'male': [21, 26, 31, 34]},
             ]
 
         for scale in scales:
-            if self.age >= scale['min'] and self.age <= scale['max']:
+            if self.age >= scale['min'] and self.age < scale['max']:
                 return scale[self.sex]
 
     # Get muscle mass scale
@@ -152,4 +152,4 @@ class bodyScales:
     # Return body type scale
     def getBodyTypeScale(self):
         return ['obese', 'overweight', 'thick-set', 'lack-exerscise', 'balanced', 'balanced-muscular', 'skinny', 'balanced-skinny', 'skinny-muscular']
-        
+
