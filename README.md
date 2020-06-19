@@ -81,6 +81,7 @@ services:
 
 ### Running script directly on your host system (if your platform is not listed/supported):
 
+**Note: Python 3.6 or higher is required to run the script manually**
 1. Install python requirements (pip3 install -r requirements.txt)
 1. Open `wrapper.sh` and configure your environment variables to suit your setup.
 1. Add a cron-tab entry to wrapper like so:
