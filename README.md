@@ -16,13 +16,13 @@ Note: Framework is present to also read from Xiaomi Scale V1, although I do not 
 
 1. Retrieve the scale's MAC Address using this command:
 ```
-$ sudo hcitool lescan | grep -i MIBCS
+$ sudo hcitool lescan
 
 LE Scan ...
 C4:D3:8C:12:4C:57 MIBCS
 [...]
 ```
-1. Note down your `MIBCS` mac address - we will need to use this as part of your configuration...
+1. Note down your `MIBCS` or `MI SCALE2` mac address - we will need to use this as part of your configuration...
 
 ## Setup & Configuration:
 ### Running script with Docker:
