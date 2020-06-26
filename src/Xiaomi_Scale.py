@@ -38,6 +38,7 @@ MQTT_HOST = os.getenv('MQTT_HOST', '127.0.0.1')
 MQTT_PORT = int(os.getenv('MQTT_PORT', 1883))
 MQTT_PREFIX = os.getenv('MQTT_PREFIX', 'miscale')
 TIME_INTERVAL = int(os.getenv('TIME_INTERVAL', 30))
+HCI_DEV = os.getenv('HCI_DEV', 'hci0')[-1]
 OLD_MEASURE = ''
 
 # User Variables...
@@ -165,7 +166,7 @@ def main():
     BluetoothFailCounter = 0
     while True:
         try:
-            scanner = btle.Scanner().withDelegate(ScanProcessor())
+            scanner = btle.Scanner(HCI_DEV).withDelegate(ScanProcessor())
             scanner.scan(5) # Adding passive=True to try and fix issues on RPi devices
         except BTLEDisconnectError as error:
             sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - btle disconnected: {error}\n")
