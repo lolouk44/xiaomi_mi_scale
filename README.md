@@ -5,7 +5,6 @@ Code to read weight measurements from Xiaomi Body Scales.
 ## Supported Scales:
 Name | Model | Picture
 --- | --- | ---
-
 [Mi Smart Scale 2](https://www.mi.com/global/scale) | (XMTZC04HM) | ![Mi Scale_2](Screenshots/Mi_Smart_Scale_2_Thumb.png)
 [Mi Body Composition Scale](https://www.mi.com/global/mi-body-composition-scale/) | XMTZC02HM | ![Mi Scale](Screenshots/Mi_Body_Composition_Scale_Thumb.png)
 [Mi Body Composition Scale 2](https://c.mi.com/thread-2289389-1-0.html) | (XMTZC05HM) | ![Mi Body Composition Scale 2](Screenshots/Mi_Body_Composition_Scale_2_Thumb.png)
