@@ -1,16 +1,14 @@
 # Xiaomi Mi Scale
 
-Code to read weight measurements from [Mi Body Composition Scale](https://www.mi.com/global/mi-body-composition-scale/) (aka Xiaomi Mi Scale V2)
+Code to read weight measurements from Xiaomi Body Scales.
 
-![Mi Scale](Screenshots/Mi_Scale.png)
+## Supported Scales:
+Name | Model | Picture
+--- | --- | :---:
+[Mi Smart Scale 2](https://www.mi.com/global/scale) &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; | XMTZC04HM | ![Mi Scale_2](Screenshots/Mi_Smart_Scale_2_Thumb.png)
+[Mi Body Composition Scale](https://www.mi.com/global/mi-body-composition-scale/) | XMTZC02HM | ![Mi Scale](Screenshots/Mi_Body_Composition_Scale_Thumb.png)
+[Mi Body Composition Scale 2](https://c.mi.com/thread-2289389-1-0.html) | XMTZC05HM | ![Mi Body Composition Scale 2](Screenshots/Mi_Body_Composition_Scale_2_Thumb.png)
 
-
-Also works with [Mi Body Composition Scale 2](https://c.mi.com/thread-2289389-1-0.html) (Model # XMTZC05HM)
-
-![Mi Scale_2](Screenshots/Mi_Scale_2.png)
-
-
-Note: Framework is present to also read from Xiaomi Scale V1, although I do not own one to test so the code has not been maintained
 
 ## Getting the Mac Address of your Scale:
 
@@ -22,7 +20,10 @@ LE Scan ...
 C4:D3:8C:12:4C:57 MIBCS
 [...]
 ```
-1. Note down your `MIBCS` or `MI SCALE2` mac address - we will need to use this as part of your configuration...
+1. Note down the MAC address of your scale, we will need to use this as part of your configuration... Depending on your scale it could be one of
+	1. `MI SCALE2`
+	1. `MIBCS`
+	1. `MIBFS`
 
 ## Setup & Configuration:
 ### Running script with Docker:
@@ -49,33 +50,34 @@ services:
     privileged: true
 
     environment:
+    - HCI_DEV=hci0                  # Bluetooth hci device to use. Defaults to hci0
     - MISCALE_MAC=00:00:00:00:00:00 # Mac address of your scale
-    - MQTT_HOST=127.0.0.1  # MQTT Server (defaults to 127.0.0.1)
-    - MQTT_PREFIX=miScale
-    - MQTT_USERNAME=       # Username for MQTT server (comment out if not required)
-    - MQTT_PASSWORD=       # Password for MQTT (comment out if not required)
-    - MQTT_PORT=           # Defaults to 1883
-    - TIME_INTERVAL=30     # Time in sec between each query to the scale, to allow other applications to use the Bluetooth module. Defaults to 30
+    - MQTT_HOST=127.0.0.1           # MQTT Server (defaults to 127.0.0.1)
+    - MQTT_PREFIX=miScale           # MQTT Topic Prefix. Defaults to miscale
+    - MQTT_USERNAME=                # Username for MQTT server (comment out if not required)
+    - MQTT_PASSWORD=                # Password for MQTT (comment out if not required)
+    - MQTT_PORT=                    # Defaults to 1883
+    - TIME_INTERVAL=30              # Time in sec between each query to the scale, to allow other applications to use the Bluetooth module. Defaults to 30
 
       # Auto-gender selection/config -- This is used to create the calculations such as BMI, Water/Bone Mass etc...
       # Up to 3 users possible as long as weights do not overlap!
 
-    - USER1_GT=70            # If the weight is greater than this number, we'll assume that we're weighing User #1
-    - USER1_SEX=male
-    - USER1_NAME=Jo          # Name of the user
-    - USER1_HEIGHT=175       # Height (in cm) of the user
-    - USER1_DOB=1990-01-01   # DOB (in yyyy-mm-dd format)
+    - USER1_GT=70                   # If the weight is greater than this number, we'll assume that we're weighing User #1
+    - USER1_SEX=male                # male / female
+    - USER1_NAME=Jo                 # Name of the user
+    - USER1_HEIGHT=175              # Height (in cm) of the user
+    - USER1_DOB=1990-01-01          # DOB (in yyyy-mm-dd format)
 
-    - USER2_LT=35            # If the weight is less than this number, we'll assume that we're weighing User #2
-    - USER2_SEX=female
-    - USER2_NAME=Serena      # Name of the user
-    - USER2_HEIGHT=95        # Height (in cm) of the user
-    - USER2_DOB=1990-01-01   # DOB (in yyyy-mm-dd format)
+    - USER2_LT=35                   # If the weight is less than this number, we'll assume that we're weighing User #2
+    - USER2_SEX=female              # male / female
+    - USER2_NAME=Serena             # Name of the user
+    - USER2_HEIGHT=95               # Height (in cm) of the user
+    - USER2_DOB=1990-01-01          # DOB (in yyyy-mm-dd format)
 
-    - USER3_SEX=female
-    - USER3_NAME=Missy       # Name of the user
-    - USER3_HEIGHT=150       # Height (in cm) of the user
-    - USER3_DOB=1990-01-01   # DOB (in yyyy-mm-dd format)
+    - USER3_SEX=female              # male / female
+    - USER3_NAME=Missy              # Name of the user
+    - USER3_HEIGHT=150              # Height (in cm) of the user
+    - USER3_DOB=1990-01-01          # DOB (in yyyy-mm-dd format)
 ```
 
 
