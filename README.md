@@ -14,16 +14,16 @@ Name | Model | Picture
 
 1. Retrieve the scale's MAC Address using this command:
 ```
-$ sudo hcitool lescan | grep -i MIBCS
+$ sudo hcitool lescan
 
 LE Scan ...
 C4:D3:8C:12:4C:57 MIBCS
 [...]
 ```
 1. Note down the MAC address of your scale, we will need to use this as part of your configuration... Depending on your scale it could be one of
+	1. `MI SCALE2`
 	1. `MIBCS`
 	1. `MIBFS`
-	1. `MI SCALE2`
 
 ## Setup & Configuration:
 ### Running script with Docker:
