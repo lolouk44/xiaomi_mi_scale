@@ -1,16 +1,15 @@
 # Xiaomi Mi Scale
 
-Code to read weight measurements from [Mi Body Composition Scale](https://www.mi.com/global/mi-body-composition-scale/) (aka Xiaomi Mi Scale V2)
+Code to read weight measurements from Xiaomi Body Scales.
 
-![Mi Scale](Screenshots/Mi_Scale.png)
+## Supported Scales:
+Name | Model | Picture
+--- | --- | ---
 
+[Mi Smart Scale 2](https://www.mi.com/global/scale) | (XMTZC04HM) | ![Mi Scale_2](Screenshots/Mi_Smart_Scale_2_Thumb.png)
+[Mi Body Composition Scale](https://www.mi.com/global/mi-body-composition-scale/) | XMTZC02HM | ![Mi Scale](Screenshots/Mi_Body_Composition_Scale_Thumb.png)
+[Mi Body Composition Scale 2](https://c.mi.com/thread-2289389-1-0.html) | (XMTZC05HM) | ![Mi Body Composition Scale 2](Screenshots/Mi_Body_Composition_Scale_2_Thumb.png)
 
-Also works with [Mi Body Composition Scale 2](https://c.mi.com/thread-2289389-1-0.html) (Model # XMTZC05HM)
-
-![Mi Scale_2](Screenshots/Mi_Scale_2.png)
-
-
-Note: Framework is present to also read from Xiaomi Scale V1, although I do not own one to test so the code has not been maintained
 
 ## Getting the Mac Address of your Scale:
 
@@ -22,7 +21,10 @@ LE Scan ...
 C4:D3:8C:12:4C:57 MIBCS
 [...]
 ```
-1. Note down your `MIBCS` mac address - we will need to use this as part of your configuration...
+1. Note down the MAC address of your scale, we will need to use this as part of your configuration... Depending on your scale it could be one of
+	1. `MIBCS`
+	1. `MIBFS`
+	1. `MI SCALE2`
 
 ## Setup & Configuration:
 ### Running script with Docker:
