@@ -50,33 +50,34 @@ services:
     privileged: true
 
     environment:
+    - HCI_DEV=hci0                  # Bluetooth hci device to use. Defaults to hci0
     - MISCALE_MAC=00:00:00:00:00:00 # Mac address of your scale
-    - MQTT_HOST=127.0.0.1  # MQTT Server (defaults to 127.0.0.1)
-    - MQTT_PREFIX=miScale
-    - MQTT_USERNAME=       # Username for MQTT server (comment out if not required)
-    - MQTT_PASSWORD=       # Password for MQTT (comment out if not required)
-    - MQTT_PORT=           # Defaults to 1883
-    - TIME_INTERVAL=30     # Time in sec between each query to the scale, to allow other applications to use the Bluetooth module. Defaults to 30
+    - MQTT_HOST=127.0.0.1           # MQTT Server (defaults to 127.0.0.1)
+    - MQTT_PREFIX=miScale           # MQTT Topic Prefix. Defaults to miscale
+    - MQTT_USERNAME=                # Username for MQTT server (comment out if not required)
+    - MQTT_PASSWORD=                # Password for MQTT (comment out if not required)
+    - MQTT_PORT=                    # Defaults to 1883
+    - TIME_INTERVAL=30              # Time in sec between each query to the scale, to allow other applications to use the Bluetooth module. Defaults to 30
 
       # Auto-gender selection/config -- This is used to create the calculations such as BMI, Water/Bone Mass etc...
       # Up to 3 users possible as long as weights do not overlap!
 
-    - USER1_GT=70            # If the weight is greater than this number, we'll assume that we're weighing User #1
-    - USER1_SEX=male
-    - USER1_NAME=Jo          # Name of the user
-    - USER1_HEIGHT=175       # Height (in cm) of the user
-    - USER1_DOB=1990-01-01   # DOB (in yyyy-mm-dd format)
+    - USER1_GT=70                   # If the weight is greater than this number, we'll assume that we're weighing User #1
+    - USER1_SEX=male                # male / female
+    - USER1_NAME=Jo                 # Name of the user
+    - USER1_HEIGHT=175              # Height (in cm) of the user
+    - USER1_DOB=1990-01-01          # DOB (in yyyy-mm-dd format)
 
-    - USER2_LT=35            # If the weight is less than this number, we'll assume that we're weighing User #2
-    - USER2_SEX=female
-    - USER2_NAME=Serena      # Name of the user
-    - USER2_HEIGHT=95        # Height (in cm) of the user
-    - USER2_DOB=1990-01-01   # DOB (in yyyy-mm-dd format)
+    - USER2_LT=35                   # If the weight is less than this number, we'll assume that we're weighing User #2
+    - USER2_SEX=female              # male / female
+    - USER2_NAME=Serena             # Name of the user
+    - USER2_HEIGHT=95               # Height (in cm) of the user
+    - USER2_DOB=1990-01-01          # DOB (in yyyy-mm-dd format)
 
-    - USER3_SEX=female
-    - USER3_NAME=Missy       # Name of the user
-    - USER3_HEIGHT=150       # Height (in cm) of the user
-    - USER3_DOB=1990-01-01   # DOB (in yyyy-mm-dd format)
+    - USER3_SEX=female              # male / female
+    - USER3_NAME=Missy              # Name of the user
+    - USER3_HEIGHT=150              # Height (in cm) of the user
+    - USER3_DOB=1990-01-01          # DOB (in yyyy-mm-dd format)
 ```
 
 
