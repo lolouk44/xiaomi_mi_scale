@@ -10,6 +10,9 @@ Name | Model | Picture
 [Mi Body Composition Scale 2](https://c.mi.com/thread-2289389-1-0.html) | XMTZC05HM | ![Mi Body Composition Scale 2](Screenshots/Mi_Body_Composition_Scale_2_Thumb.png)
 
 
+## Home Assistant Add-On:
+If using Home Assistant (formerly known as hass.io), try instead the [Xiaomi Mi Scale Add-On for Home Assistant](https://github.com/lolouk44/xiaomi_mi_scale_ha_add_on) based on this repository.
+
 ## Getting the Mac Address of your Scale:
 
 1. Retrieve the scale's MAC Address using this command:
@@ -121,6 +124,6 @@ Under the `sensor` block, enter as many blocks as users configured in your envir
 ## Acknowledgements:
 Thanks to @syssi (https://gist.github.com/syssi/4108a54877406dc231d95514e538bde9) and @prototux (https://github.com/wiecosystem/Bluetooth) for their initial code
 
-Special thanks to [@ned-kelly](https://github.com/ned-kelly) for his help turning a "simple" python script into a fully fledge docker container
+Special thanks to [@ned-kelly](https://github.com/ned-kelly) for his help turning a "simple" python script into a fully fledged docker container
 
 Thanks to [@bpaulin](https://github.com/bpaulin) for his PRs and collaboration
