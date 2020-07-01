@@ -1,19 +1,3 @@
-#############################################################################################
-# Code to read weight measurements fom Xiaomi Scale V2
-# (Framework is prsent to also read from Xiaomi Scale V1, though I do not own one to test so code has not been maintained)
-# Must be executed with Python 3 else body measurements are incorrect.
-# Must be executed as root, therefore best to schedule via crontab every 5 min (so as not to drain the battery):
-# */5 * * * * python3 /path-to-script/Xiaomi_Scale.py
-# Multi user possible as long as weitghs do not overlap, see lines 117-131
-#
-# Thanks to @syssi (https://gist.github.com/syssi/4108a54877406dc231d95514e538bde9) and @prototux (https://github.com/wiecosystem/Bluetooth) for their initial code
-#
-# Make sure you set your MQTT credentials below and user logic/data through the environment variables
-#
-#############################################################################################
-
-
-
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from __future__ import print_function
@@ -27,37 +11,103 @@ from bluepy import btle
 from bluepy.btle import Scanner, BTLEDisconnectError, BTLEManagementError, DefaultDelegate
 import paho.mqtt.publish as publish
 from datetime import datetime
+import json
 
 import Xiaomi_Scale_Body_Metrics
 
+
+
+# First Log msg
+sys.stdout.write(' \n')
+sys.stdout.write('-------------------------------------\n')
+sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Starting Xiaomi mi Scale...\n")
+
 # Configuraiton...
-MISCALE_MAC = os.getenv('MISCALE_MAC', '')
-MQTT_USERNAME = os.getenv('MQTT_USERNAME', 'username')
-MQTT_PASSWORD = os.getenv('MQTT_PASSWORD', None)
-MQTT_HOST = os.getenv('MQTT_HOST', '127.0.0.1')
-MQTT_PORT = int(os.getenv('MQTT_PORT', 1883))
-MQTT_PREFIX = os.getenv('MQTT_PREFIX', 'miscale')
-TIME_INTERVAL = int(os.getenv('TIME_INTERVAL', 30))
-HCI_DEV = os.getenv('HCI_DEV', 'hci0')[-1]
+# Trying To Load Config From options.json (HA Add-On)
+try:
+    with open('/data/options.json') as json_file:
+        sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Loading Config From Add-On Options...\n")
+        data = json.load(json_file)
+        MISCALE_MAC = data["MISCALE_MAC"]
+        MQTT_USERNAME = None if(data["MQTT_USERNAME"] == "") else data["MQTT_USERNAME"]
+        MQTT_PASSWORD = None if(data["MQTT_PASSWORD"] == "") else data["MQTT_PASSWORD"]
+        MQTT_HOST = data["MQTT_HOST"]
+        MQTT_PORT = int(data["MQTT_PORT"])
+        MQTT_PREFIX = data["MQTT_PREFIX"]
+        TIME_INTERVAL = int(data["TIME_INTERVAL"])
+        MQTT_DISCOVERY = data["MQTT_DISCOVERY"]
+        MQTT_DISCOVERY_PREFIX = data["MQTT_DISCOVERY_PREFIX"]
+        HCI_DEV = data["HCI_DEV"][-1]
+
+        # User Variables...
+        USER1_GT = int(data["USER1_GT"])
+        USER1_SEX = data["USER1_SEX"]
+        USER1_NAME = data["USER1_NAME"]
+        USER1_HEIGHT = int(data["USER1_HEIGHT"])
+        USER1_DOB = data["USER1_DOB"]
+
+        USER2_LT = int(data["USER2_LT"])
+        USER2_SEX = data["USER2_SEX"]
+        USER2_NAME = data["USER2_NAME"]
+        USER2_HEIGHT = int(data["USER2_HEIGHT"])
+        USER2_DOB = data["USER2_DOB"]
+
+        USER3_SEX = data["USER3_SEX"]
+        USER3_NAME = data["USER3_NAME"]
+        USER3_HEIGHT = int(data["USER3_HEIGHT"])
+        USER3_DOB = data["USER3_DOB"]
+        sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Config Loaded...\n")
+
+# Failed to open options.json, Loading Config From Environment (Not HA Add-On)
+except FileNotFoundError:
+    pass
+    sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Loading Config From OS Environment...\n")
+    MISCALE_MAC = os.getenv('MISCALE_MAC', '')
+    MQTT_USERNAME = os.getenv('MQTT_USERNAME', 'username')
+    MQTT_PASSWORD = os.getenv('MQTT_PASSWORD', None)
+    MQTT_HOST = os.getenv('MQTT_HOST', '127.0.0.1')
+    MQTT_PORT = int(os.getenv('MQTT_PORT', 1883))
+    MQTT_PREFIX = os.getenv('MQTT_PREFIX', 'miscale')
+    TIME_INTERVAL = int(os.getenv('TIME_INTERVAL', 30))
+    MQTT_DISCOVERY = os.getenv('MQTT_DISCOVERY',True)
+    MQTT_DISCOVERY_PREFIX = os.getenv('MQTT_DISCOVERY_PREFIX','homeassistant')
+    HCI_DEV = os.getenv('HCI_DEV', 'hci0')[-1]
+
+    # User Variables...
+    USER1_GT = int(os.getenv('USER1_GT', '70')) # If the weight is greater than this number, we'll assume that we're weighing User #1
+    USER1_SEX = os.getenv('USER1_SEX', 'male')
+    USER1_NAME = os.getenv('USER1_NAME', 'David') # Name of the user
+    USER1_HEIGHT = int(os.getenv('USER1_HEIGHT', '175')) # Height (in cm) of the user
+    USER1_DOB = os.getenv('USER1_DOB', '1988-09-30') # DOB (in yyyy-mm-dd format)
+
+    USER2_LT = int(os.getenv('USER2_LT', '55')) # If the weight is less than this number, we'll assume that we're weighing User #2
+    USER2_SEX = os.getenv('USER2_SEX', 'female')
+    USER2_NAME = os.getenv('USER2_NAME', 'Joanne') # Name of the user
+    USER2_HEIGHT = int(os.getenv('USER2_HEIGHT', '155')) # Height (in cm) of the user
+    USER2_DOB = os.getenv('USER2_DOB', '1988-10-20') # DOB (in yyyy-mm-dd format)
+
+    USER3_SEX = os.getenv('USER3_SEX', 'male')
+    USER3_NAME = os.getenv('USER3_NAME', 'Unknown User') # Name of the user
+    USER3_HEIGHT = int(os.getenv('USER3_HEIGHT', '175')) # Height (in cm) of the user
+    USER3_DOB = os.getenv('USER3_DOB', '1988-01-01') # DOB (in yyyy-mm-dd format)
+    sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Config Loaded...\n")
+
 OLD_MEASURE = ''
 
-# User Variables...
-USER1_GT = int(os.getenv('USER1_GT', '70')) # If the weight is greater than this number, we'll assume that we're weighing User #1
-USER1_SEX = os.getenv('USER1_SEX', 'male')
-USER1_NAME = os.getenv('USER1_NAME', 'David') # Name of the user
-USER1_HEIGHT = int(os.getenv('USER1_HEIGHT', '175')) # Height (in cm) of the user
-USER1_DOB = os.getenv('USER1_DOB', '1988-09-30') # DOB (in yyyy-mm-dd format)
-
-USER2_LT = int(os.getenv('USER2_LT', '55')) # If the weight is less than this number, we'll assume that we're weighing User #2
-USER2_SEX = os.getenv('USER2_SEX', 'female')
-USER2_NAME = os.getenv('USER2_NAME', 'Joanne') # Name of the user
-USER2_HEIGHT = int(os.getenv('USER2_HEIGHT', '155')) # Height (in cm) of the user
-USER2_DOB = os.getenv('USER2_DOB', '1988-10-20') # DOB (in yyyy-mm-dd format)
-
-USER3_SEX = os.getenv('USER3_SEX', 'male')
-USER3_NAME = os.getenv('USER3_NAME', 'Unknown User') # Name of the user
-USER3_HEIGHT = int(os.getenv('USER3_HEIGHT', '175')) # Height (in cm) of the user
-USER3_DOB = os.getenv('USER3_DOB', '1988-01-01') # DOB (in yyyy-mm-dd format)
+def discovery():
+    for MQTTUser in (USER1_NAME,USER2_NAME,USER3_NAME):
+        message = '{"name": "' + MQTTUser + ' Weight",'
+        message+= '"state_topic": "miScale/' + MQTTUser + '/weight","value_template": "{{ value_json.Weight }}","unit_of_measurement": "kg",'
+        message+= '"json_attributes_topic": "miScale/' + MQTTUser + '/weight","icon": "mdi:scale-bathroom"}'
+        publish.single(
+                        MQTT_DISCOVERY_PREFIX + '/sensor/' + MQTT_PREFIX + '/' + MQTTUser + '/config',
+                        message,
+                        retain=False,
+                        hostname=MQTT_HOST,
+                        port=MQTT_PORT,
+                        auth={'username':MQTT_USERNAME, 'password':MQTT_PASSWORD}
+                    )
+    sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Discovery Completed...\n")
 
 
 class ScanProcessor():
@@ -160,9 +210,8 @@ class ScanProcessor():
             raise
 
 def main():
-    sys.stdout.write(' \n')
-    sys.stdout.write('-------------------------------------\n')
-    sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Starting Xiaomi mi Scale...\n")
+    if MQTT_DISCOVERY:
+        discovery()
     BluetoothFailCounter = 0
     while True:
         try:

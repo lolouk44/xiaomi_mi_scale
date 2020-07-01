@@ -32,6 +32,7 @@ C4:D3:8C:12:4C:57 MIBCS
 ### Running script with Docker:
 
 1. Supported platforms:
+	1. linux/386
 	1. linux/amd64
 	1. linux/arm32v6
 	1. linux/arm32v7
@@ -61,6 +62,8 @@ services:
     - MQTT_PASSWORD=                # Password for MQTT (comment out if not required)
     - MQTT_PORT=                    # Defaults to 1883
     - TIME_INTERVAL=30              # Time in sec between each query to the scale, to allow other applications to use the Bluetooth module. Defaults to 30
+    - MQTT_DISCOVERY=true           # Home Assistant Discovery (true/false), defaults to true
+    - MQTT_DISCOVERY_PREFIX=        # Home Assistant Discovery Prefix, defaults to homeassistant
 
       # Auto-gender selection/config -- This is used to create the calculations such as BMI, Water/Bone Mass etc...
       # Up to 3 users possible as long as weights do not overlap!
