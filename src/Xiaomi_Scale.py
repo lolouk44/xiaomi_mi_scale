@@ -102,7 +102,7 @@ def discovery():
         publish.single(
                         MQTT_DISCOVERY_PREFIX + '/sensor/' + MQTT_PREFIX + '/' + MQTTUser + '/config',
                         message,
-                        retain=False,
+                        retain=True,
                         hostname=MQTT_HOST,
                         port=MQTT_PORT,
                         auth={'username':MQTT_USERNAME, 'password':MQTT_PASSWORD}
