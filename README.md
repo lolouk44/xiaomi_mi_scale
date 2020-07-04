@@ -67,7 +67,6 @@ services:
     container_name: mi-scale
     restart: always
 
-    network_mode: host
     privileged: true
 
     environment:
