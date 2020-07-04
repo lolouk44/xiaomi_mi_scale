@@ -15,7 +15,7 @@ If using Home Assistant (formerly known as hass.io), try instead the [Xiaomi Mi 
 
 ## Getting the Mac Address of your Scale:
 
-1. Retrieve the scale's MAC Address using this command:
+1. Retrieve the scale's MAC Address using **hcitool**:
 ```
 $ sudo hcitool lescan
 
@@ -23,7 +23,24 @@ LE Scan ...
 C4:D3:8C:12:4C:57 MIBCS
 [...]
 ```
-1. Note down the MAC address of your scale, we will need to use this as part of your configuration... Depending on your scale it could be one of
+*hcitool is deprecated, if this fails with **'Set scan parameters failed: Input/output error'**, use the following command* 
+
+2. Retrieve the scale's MAC address using **bluepy** in Ubuntu/Debian:
+
+```
+$ sudo apt-get install python3-pip libglib2.0-dev
+$ sudo pip3 install bluepy
+
+$ sudo /usr/local/bin/blescan
+Scanning for devices...
+   Device (new): c4:d3:8c:12:4c:57 (public), -91 dBm 
+	Flags: <00>
+	Complete Local Name: 'MIBCS'
+	Manufacturer: <000000000000>
+[...]
+```
+
+3. Note down the MAC address of your scale, we will need to use this as part of your configuration... Depending on your scale it could be one of
 	1. `MI SCALE2`
 	1. `MIBCS`
 	1. `MIBFS`
