@@ -15,18 +15,8 @@ If using Home Assistant (formerly known as hass.io), try instead the [Xiaomi Mi 
 
 ## Getting the Mac Address of your Scale:
 
-1. Retrieve the scale's MAC Address using this command:
-```
-$ sudo hcitool lescan
-
-LE Scan ...
-C4:D3:8C:12:4C:57 MIBCS
-[...]
-```
-1. Note down the MAC address of your scale, we will need to use this as part of your configuration... Depending on your scale it could be one of
-	1. `MI SCALE2`
-	1. `MIBCS`
-	1. `MIBFS`
+1. Retrieve the scale's MAC Address from the Xiaomi Mi Fit App:
+![MAC Address](Screenshots/MAC_Address.png)
 
 ## Setup & Configuration:
 ### Running script with Docker:
