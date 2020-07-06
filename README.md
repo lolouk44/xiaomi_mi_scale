@@ -16,6 +16,7 @@ If using Home Assistant (formerly known as hass.io), try instead the [Xiaomi Mi 
 ## Getting the Mac Address of your Scale:
 
 1. Retrieve the scale's MAC Address from the Xiaomi Mi Fit App:
+
 ![MAC Address](Screenshots/MAC_Address.png)
 
 ## Setup & Configuration:
