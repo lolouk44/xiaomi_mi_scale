@@ -11,7 +11,7 @@ Name | Model | Picture
 
 
 ## Home Assistant Add-On:
-If using Home Assistant (formerly known as hass.io), try instead the [Xiaomi Mi Scale Add-On for Home Assistant](https://github.com/lolouk44/xiaomi_mi_scale_ha_add_on) based on this repository.
+If using Home Assistant (formerly known as hass.io), try instead the [Xiaomi Mi Scale Add-On for Home Assistant](https://github.com/lolouk44/hassio-addons/tree/master/mi-scale) based on this repository.
 
 ## Getting the Mac Address of your Scale:
 
