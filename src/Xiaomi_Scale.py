@@ -28,34 +28,126 @@ try:
     with open('/data/options.json') as json_file:
         sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Loading Config From Add-On Options...\n")
         data = json.load(json_file)
-        MISCALE_MAC = data["MISCALE_MAC"]
-        MQTT_USERNAME = None if(data["MQTT_USERNAME"] == "") else data["MQTT_USERNAME"]
-        MQTT_PASSWORD = None if(data["MQTT_PASSWORD"] == "") else data["MQTT_PASSWORD"]
-        MQTT_HOST = data["MQTT_HOST"]
-        MQTT_PORT = int(data["MQTT_PORT"])
-        MQTT_PREFIX = data["MQTT_PREFIX"]
-        TIME_INTERVAL = int(data["TIME_INTERVAL"])
-        MQTT_DISCOVERY = data["MQTT_DISCOVERY"]
-        MQTT_DISCOVERY_PREFIX = data["MQTT_DISCOVERY_PREFIX"]
-        HCI_DEV = data["HCI_DEV"][-1]
-
-        # User Variables...
-        USER1_GT = int(data["USER1_GT"])
-        USER1_SEX = data["USER1_SEX"]
-        USER1_NAME = data["USER1_NAME"]
-        USER1_HEIGHT = int(data["USER1_HEIGHT"])
-        USER1_DOB = data["USER1_DOB"]
-
-        USER2_LT = int(data["USER2_LT"])
-        USER2_SEX = data["USER2_SEX"]
-        USER2_NAME = data["USER2_NAME"]
-        USER2_HEIGHT = int(data["USER2_HEIGHT"])
-        USER2_DOB = data["USER2_DOB"]
-
-        USER3_SEX = data["USER3_SEX"]
-        USER3_NAME = data["USER3_NAME"]
-        USER3_HEIGHT = int(data["USER3_HEIGHT"])
-        USER3_DOB = data["USER3_DOB"]
+        try:
+            MISCALE_MAC = data["MISCALE_MAC"]
+        except:
+            sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - MAC Address not provided...\n")
+            raise
+        try:
+            MQTT_USERNAME = data["MQTT_USERNAME"]
+        except:
+            MQTT_USERNAME = "username"
+            pass
+        try:
+            MQTT_PASSWORD = data["MQTT_PASSWORD"]
+        except:
+            MQTT_PASSWORD = None
+            pass
+        try:
+            MQTT_HOST = data["MQTT_HOST"]
+        except:
+            sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - MQTT Host not provided...\n")
+            raise
+        try:
+            MQTT_PORT = int(data["MQTT_PORT"])
+        except:
+            MQTT_PORT = 1883
+            pass
+        try:
+            MQTT_PREFIX = data["MQTT_PREFIX"]
+        except:
+            MQTT_PREFIX = "miscale"
+            pass
+        try:
+            TIME_INTERVAL = int(data["TIME_INTERVAL"])
+        except:
+            TIME_INTERVAL = 30
+            pass
+        try:
+            MQTT_DISCOVERY = data["MQTT_DISCOVERY"]
+        except:
+            MQTT_DISCOVERY = True
+            pass
+        try:
+            MQTT_DISCOVERY_PREFIX = data["MQTT_DISCOVERY_PREFIX"]
+        except:
+            MQTT_DISCOVERY_PREFIX = "homeassistant"
+            pass
+        try:
+            HCI_DEV = data["HCI_DEV"][-1]
+        except:
+            HCI_DEV = "hci0"[-1]
+            pass
+        try:
+            USER1_GT = int(data["USER1_GT"])
+        except:
+            sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - USER1_GT not provided...\n")
+            raise
+        try:
+            USER1_SEX = data["USER1_SEX"]
+        except:
+            sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - USER1_SEX not provided...\n")
+            raise
+        try:
+            USER1_NAME = data["USER1_NAME"]
+        except:
+            sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - USER1_NAME not provided...\n")
+            raise
+        try:
+            USER1_HEIGHT = int(data["USER1_HEIGHT"])
+        except:
+            sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - USER1_HEIGHT not provided...\n")
+            raise
+        try:
+            USER1_DOB = data["USER1_DOB"]
+        except:
+            sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - USER1_DOB not provided...\n")
+            raise
+        try:
+            USER2_LT = int(data["USER2_LT"])
+        except:
+            USER2_LT = USER1_GT
+            pass
+        try:
+            USER2_SEX = data["USER2_SEX"]
+        except:
+            USER2_SEX = "female"
+            pass
+        try:
+            USER2_NAME = data["USER2_NAME"]
+        except:
+            USER2_NAME = "Serena"
+            pass
+        try:
+            USER2_HEIGHT = int(data["USER2_HEIGHT"])
+        except:
+            USER2_HEIGHT = 95
+            pass
+        try:
+            USER2_DOB = data["USER2_DOB"]
+        except:
+            USER2_DOB = "1990-01-01"
+            pass
+        try:
+            USER3_SEX = data["USER3_SEX"]
+        except:
+            USER3_SEX = "female"
+            pass
+        try:
+            USER3_NAME = data["USER3_NAME"]
+        except:
+            USER3_NAME = "Missy"
+            pass
+        try:
+            USER3_HEIGHT = int(data["USER3_HEIGHT"])
+        except:
+            USER3_HEIGHT = 150
+            pass
+        try:
+            USER3_DOB = data["USER3_DOB"]
+        except:
+            USER3_DOB = "1990-01-01"
+            pass
         sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Config Loaded...\n")
 
 # Failed to open options.json, Loading Config From Environment (Not HA Add-On)
@@ -97,8 +189,8 @@ OLD_MEASURE = ''
 def discovery():
     for MQTTUser in (USER1_NAME,USER2_NAME,USER3_NAME):
         message = '{"name": "' + MQTTUser + ' Weight",'
-        message+= '"state_topic": "miScale/' + MQTTUser + '/weight","value_template": "{{ value_json.Weight }}","unit_of_measurement": "kg",'
-        message+= '"json_attributes_topic": "miScale/' + MQTTUser + '/weight","icon": "mdi:scale-bathroom"}'
+        message+= '"state_topic": "miscale/' + MQTTUser + '/weight","value_template": "{{ value_json.Weight }}","unit_of_measurement": "kg",'
+        message+= '"json_attributes_topic": "miscale/' + MQTTUser + '/weight","icon": "mdi:scale-bathroom"}'
         publish.single(
                         MQTT_DISCOVERY_PREFIX + '/sensor/' + MQTT_PREFIX + '/' + MQTTUser + '/config',
                         message,
