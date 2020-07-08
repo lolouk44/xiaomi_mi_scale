@@ -63,7 +63,7 @@ services:
       # Here is the logic used to assign a measured weight to a user:
       # if [measured value] is greater than USER1_GT, assign it to USER1
       # else if [measured value] is less than USER2_LT, assign it to USER2
-      # else assign it to USER3 (e.g. USER2_LT > [measured value] > USER1_GT)
+      # else assign it to USER3 (e.g. USER2_LT < [measured value] < USER1_GT)
 
     - USER1_GT=70                   # If the weight is greater than this number, we'll assume that we're weighing User #1
     - USER1_SEX=male                # male / female
