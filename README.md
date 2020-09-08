@@ -104,7 +104,7 @@ Under the `sensor` block, enter as many blocks as users configured in your envir
   - platform: mqtt
     name: "Example Name Weight"
     state_topic: "miscale/USER_NAME/weight"
-    value_template: "{{ value_json['Weight'] }}"
+    value_template: "{{ value_json['weight'] }}"
     unit_of_measurement: "kg"
     json_attributes_topic: "miscale/USER_NAME/weight"
     icon: mdi:scale-bathroom
@@ -112,7 +112,7 @@ Under the `sensor` block, enter as many blocks as users configured in your envir
   - platform: mqtt
     name: "Example Name BMI"
     state_topic: "miscale/USER_NAME/weight"
-    value_template: "{{ value_json['BMI'] }}"
+    value_template: "{{ value_json['bmi'] }}"
     icon: mdi:human-pregnant
     unit_of_measurement: "kg/m2"
 
