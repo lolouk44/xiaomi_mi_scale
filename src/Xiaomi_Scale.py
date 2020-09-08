@@ -218,9 +218,11 @@ class ScanProcessor():
                 ### Xiaomi V1 Scale ###
                 if data.startswith('1d18') and sdid == 22:
                     measunit = data[4:6]
+                    sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Measuring Unit: {measunit}\n")
                     measured = int((data[8:10] + data[6:8]), 16) * 0.01
+                    sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Measured Raw Weight: {measured}\n")
                     unit = ''
-                    if measunit.startswith(('03', 'b3')): unit = 'lbs'
+                    if measunit.startswith(('03', 'a3')): unit = 'lbs'
                     if measunit.startswith(('12', 'b2')): unit = 'jin'
                     if measunit.startswith(('22', 'a2')): unit = 'kg' ; measured = measured / 2
                     if unit:
@@ -249,12 +251,15 @@ class ScanProcessor():
 
 
     def _publish(self, weight, unit, mitdatetime, hasImpedance, miimpedance):
-        if int(weight) > USER1_GT:
+        if unit == "lbs": calcweight = round(weight * 0.4536, 2)
+        if unit == "jin": calcweight = round(weight * 0.5, 2)
+        if unit == "kg": calcweight = weight
+        if int(calcweight) > USER1_GT:
             user = USER1_NAME
             height = USER1_HEIGHT
             age = self.GetAge(USER1_DOB)
             sex = USER1_SEX
-        elif int(weight) < USER2_LT:
+        elif int(calcweight) < USER2_LT:
             user = USER2_NAME
             height = USER2_HEIGHT
             age = self.GetAge(USER2_DOB)
@@ -264,26 +269,28 @@ class ScanProcessor():
             height = USER3_HEIGHT
             age = self.GetAge(USER3_DOB)
             sex = USER3_SEX
-        lib = Xiaomi_Scale_Body_Metrics.bodyMetrics(weight, height, age, sex, 0)
+
+        lib = Xiaomi_Scale_Body_Metrics.bodyMetrics(calcweight, height, age, sex, 0)
         message = '{'
-        message += '"Weight":"' + "{:.2f}".format(weight) + '"'
-        message += ',"BMI":"' + "{:.2f}".format(lib.getBMI()) + '"'
-        message += ',"Basal Metabolism":"' + "{:.2f}".format(lib.getBMR()) + '"'
-        message += ',"Visceral Fat":"' + "{:.2f}".format(lib.getVisceralFat()) + '"'
+        message += '"weight":"' + "{:.2f}".format(weight) + '"'
+        message += ',"weight_unit":"' + str(unit) + '"'
+        message += ',"bmi":"' + "{:.2f}".format(lib.getBMI()) + '"'
+        message += ',"basal_metabolism":"' + "{:.2f}".format(lib.getBMR()) + '"'
+        message += ',"visceral_fat":"' + "{:.2f}".format(lib.getVisceralFat()) + '"'
 
         if hasImpedance:
-            lib = Xiaomi_Scale_Body_Metrics.bodyMetrics(weight, height, age, sex, int(miimpedance))
+            lib = Xiaomi_Scale_Body_Metrics.bodyMetrics(calcweight, height, age, sex, int(miimpedance))
             bodyscale = ['Obese', 'Overweight', 'Thick-set', 'Lack-exerscise', 'Balanced', 'Balanced-muscular', 'Skinny', 'Balanced-skinny', 'Skinny-muscular']
-            message += ',"Lean Body Mass":"' + "{:.2f}".format(lib.getLBMCoefficient()) + '"'
-            message += ',"Body Fat":"' + "{:.2f}".format(lib.getFatPercentage()) + '"'
-            message += ',"Water":"' + "{:.2f}".format(lib.getWaterPercentage()) + '"'
-            message += ',"Bone Mass":"' + "{:.2f}".format(lib.getBoneMass()) + '"'
-            message += ',"Muscle Mass":"' + "{:.2f}".format(lib.getMuscleMass()) + '"'
-            message += ',"Protein":"' + "{:.2f}".format(lib.getProteinPercentage()) + '"'
-            message += ',"Body Type":"' + str(bodyscale[lib.getBodyType()]) + '"'
-            message += ',"Metabolic Age":"' + "{:.0f}".format(lib.getMetabolicAge()) + '"'
+            message += ',"lean_body_mass":"' + "{:.2f}".format(lib.getLBMCoefficient()) + '"'
+            message += ',"body_fat":"' + "{:.2f}".format(lib.getFatPercentage()) + '"'
+            message += ',"water":"' + "{:.2f}".format(lib.getWaterPercentage()) + '"'
+            message += ',"bone_mass":"' + "{:.2f}".format(lib.getBoneMass()) + '"'
+            message += ',"muscle_mass":"' + "{:.2f}".format(lib.getMuscleMass()) + '"'
+            message += ',"protein":"' + "{:.2f}".format(lib.getProteinPercentage()) + '"'
+            message += ',"body_type":"' + str(bodyscale[lib.getBodyType()]) + '"'
+            message += ',"metabolic_age":"' + "{:.0f}".format(lib.getMetabolicAge()) + '"'
 
-        message += ',"TimeStamp":"' + mitdatetime + '"'
+        message += ',"timestamp":"' + mitdatetime + '"'
         message += '}'
         try:
             sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Publishing data to topic {MQTT_PREFIX + '/' + user + '/weight'}: {message}\n")
@@ -302,7 +309,7 @@ class ScanProcessor():
             raise
 
 def main():
-    if MQTT_DISCOVERY:
+    if MQTT_DISCOVERY.lower() in ['true', '1', 'y', 'yes']:
         discovery()
     BluetoothFailCounter = 0
     while True:
@@ -316,7 +323,10 @@ def main():
             sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Bluetooth connection error: {error}\n")
             if BluetoothFailCounter >= 4:
                 sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - 5+ Bluetooth connection errors. Resetting Bluetooth...\n")
-                cmd = 'hciconfig hci0 reset'
+                cmd = 'hciconfig hci' + HCI_DEV + ' down'
+                ps = subprocess.Popen(cmd, shell=True)
+                time.sleep(1)
+                cmd = 'hciconfig hci' + HCI_DEV + ' up'
                 ps = subprocess.Popen(cmd, shell=True)
                 time.sleep(30)
                 BluetoothFailCounter = 0

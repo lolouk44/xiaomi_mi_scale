@@ -14,19 +14,19 @@ class bodyMetrics:
         # Check for potential out of boundaries
         if self.height > 220:
             print("Height is too high (limit: >220cm) or scale is sleeping")
-            sys.stderr.write('Height is over 220cm or scale is sleeping\n')
+            sys.stderr.write('Height is over 220cm\n')
             exit()
         elif weight < 10 or weight > 200:
-            print("Weight is either too low or too high (limits: <10kg and >200kg) or scale is sleeping")
-            sys.stderr.write('Weight is above 10kg or below 200kg or scale is sleeping\n')
+            print("Weight is either too low or too high (limits: <10kg and >200kg)")
+            sys.stderr.write('Weight is below 10kg or above 200kg\n')
             exit()
         elif age > 99:
-            print("Age is too high (limit >99 years) or scale is sleeping")
-            sys.stderr.write('Age is above 99 years or scale is sleeping\n')
+            print("Age is too high (limit >99 years)")
+            sys.stderr.write('Age is above 99 years\n')
             exit()
         elif impedance > 3000:
-            print("Impedance is above 3000ohm or scale is sleeping")
-            sys.stderr.write('Impedance is above 3000ohm or scale is sleeping\n')
+            print("Impedance is above 3000 Ohm")
+            sys.stderr.write('Impedance is above 3000 Ohm\n')
             exit()
 
     # Set the value to a boundary if it overflows

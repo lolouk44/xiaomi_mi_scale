@@ -48,7 +48,7 @@ services:
     - HCI_DEV=hci0                  # Bluetooth hci device to use. Defaults to hci0
     - MISCALE_MAC=00:00:00:00:00:00 # Mac address of your scale
     - MQTT_HOST=127.0.0.1           # MQTT Server (defaults to 127.0.0.1)
-    - MQTT_PREFIX=miScale           # MQTT Topic Prefix. Defaults to miscale
+    - MQTT_PREFIX=miscale           # MQTT Topic Prefix. Defaults to miscale
     - MQTT_USERNAME=                # Username for MQTT server (comment out if not required)
     - MQTT_PASSWORD=                # Password for MQTT (comment out if not required)
     - MQTT_PORT=                    # Defaults to 1883
@@ -61,17 +61,17 @@ services:
 
 
       # Here is the logic used to assign a measured weight to a user:
-      # if [measured value] is greater than USER1_GT, assign it to USER1
-      # else if [measured value] is less than USER2_LT, assign it to USER2
-      # else assign it to USER3 (e.g. USER2_LT < [measured value] < USER1_GT)
+      # if [measured value in kg] is greater than USER1_GT, assign it to USER1
+      # else if [measured value in kg] is less than USER2_LT, assign it to USER2
+      # else assign it to USER3 (e.g. USER2_LT < [measured value in kg] < USER1_GT)
 
-    - USER1_GT=70                   # If the weight is greater than this number, we'll assume that we're weighing User #1
+    - USER1_GT=70                   # If the weight (in kg) is greater than this number, we'll assume that we're weighing User #1
     - USER1_SEX=male                # male / female
     - USER1_NAME=Jo                 # Name of the user
     - USER1_HEIGHT=175              # Height (in cm) of the user
     - USER1_DOB=1990-01-01          # DOB (in yyyy-mm-dd format)
 
-    - USER2_LT=35                   # If the weight is less than this number, we'll assume that we're weighing User #2
+    - USER2_LT=35                   # If the weight (in kg) is less than this number, we'll assume that we're weighing User #2
     - USER2_SEX=female              # male / female
     - USER2_NAME=Serena             # Name of the user
     - USER2_HEIGHT=95               # Height (in cm) of the user
@@ -103,17 +103,18 @@ Under the `sensor` block, enter as many blocks as users configured in your envir
 ```yaml
   - platform: mqtt
     name: "Example Name Weight"
-    state_topic: "miScale/USER_NAME/weight"
+    state_topic: "miscale/USER_NAME/weight"
     value_template: "{{ value_json['Weight'] }}"
     unit_of_measurement: "kg"
-    json_attributes_topic: "miScale/USER_NAME/weight"
+    json_attributes_topic: "miscale/USER_NAME/weight"
     icon: mdi:scale-bathroom
 
   - platform: mqtt
     name: "Example Name BMI"
-    state_topic: "miScale/USER_NAME/weight"
+    state_topic: "miscale/USER_NAME/weight"
     value_template: "{{ value_json['BMI'] }}"
     icon: mdi:human-pregnant
+    unit_of_measurement: "kg/m2"
 
 ```
 
