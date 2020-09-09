@@ -162,6 +162,10 @@ except FileNotFoundError:
     MQTT_PREFIX = os.getenv('MQTT_PREFIX', 'miscale')
     TIME_INTERVAL = int(os.getenv('TIME_INTERVAL', 30))
     MQTT_DISCOVERY = os.getenv('MQTT_DISCOVERY',True)
+    if MQTT_DISCOVERY.lower() in ['true', '1', 'y', 'yes']:
+        MQTT_DISCOVERY = True
+    else:
+        MQTT_DISCOVERY = False
     MQTT_DISCOVERY_PREFIX = os.getenv('MQTT_DISCOVERY_PREFIX','homeassistant')
     HCI_DEV = os.getenv('HCI_DEV', 'hci0')[-1]
 
@@ -309,7 +313,7 @@ class ScanProcessor():
             raise
 
 def main():
-    if MQTT_DISCOVERY.lower() in ['true', '1', 'y', 'yes']:
+    if MQTT_DISCOVERY:
         discovery()
     BluetoothFailCounter = 0
     while True:
