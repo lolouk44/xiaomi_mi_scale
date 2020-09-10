@@ -2,6 +2,15 @@
 
 Code to read weight measurements from Xiaomi Body Scales.
 
+## BREAKING CHANGE:
+Please note there was a breaking change in 0.1.8. The MQTT message json attributes are now in lower snake_case to be compliant with Home-Assistant Attributes.
+This means Home-Assistant sensor configuration needs to be adjusted.
+For example 
+`value_template: "{{ value_json['Weight'] }}"`
+Needs to be replaced with
+`value_template: "{{ value_json['weight'] }}"`
+(note the lowercase `w` in `weight`)
+
 ## Supported Scales:
 Name | Model | Picture
 --- | --- | :---:
