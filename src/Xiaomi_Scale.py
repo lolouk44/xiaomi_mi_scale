@@ -191,6 +191,11 @@ except FileNotFoundError:
 OLD_MEASURE = ''
 
 def discovery():
+    """
+    Publish discovery discovery.
+
+    Args:
+    """
     for MQTTUser in (USER1_NAME,USER2_NAME,USER3_NAME):
         message = '{"name": "' + MQTTUser + ' Weight",'
         message+= '"state_topic": "miscale/' + MQTTUser + '/weight","value_template": "{{ value_json.weight }}","unit_of_measurement": "kg",'
@@ -208,14 +213,36 @@ def discovery():
 
 class ScanProcessor():
     def GetAge(self, d1):
+        """
+        Retrieves time in the year.
+
+        Args:
+            self: (todo): write your description
+            d1: (int): write your description
+        """
         d1 = datetime.strptime(d1, "%Y-%m-%d")
         d2 = datetime.strptime(datetime.today().strftime('%Y-%m-%d'),'%Y-%m-%d')
         return abs((d2 - d1).days)/365
 
     def __init__(self):
+        """
+        Initialize the default signals.
+
+        Args:
+            self: (todo): write your description
+        """
         DefaultDelegate.__init__(self)
 
     def handleDiscovery(self, dev, isNewDev, isNewData):
+        """
+        Handle a discovery.
+
+        Args:
+            self: (todo): write your description
+            dev: (todo): write your description
+            isNewDev: (todo): write your description
+            isNewData: (todo): write your description
+        """
         global OLD_MEASURE
         if dev.addr == MISCALE_MAC.lower() and isNewDev:
             for (sdid, desc, data) in dev.getScanData():
@@ -255,6 +282,17 @@ class ScanProcessor():
 
 
     def _publish(self, weight, unit, mitdatetime, hasImpedance, miimpedance):
+        """
+        Publish the unit
+
+        Args:
+            self: (todo): write your description
+            weight: (str): write your description
+            unit: (str): write your description
+            mitdatetime: (todo): write your description
+            hasImpedance: (todo): write your description
+            miimpedance: (todo): write your description
+        """
         if unit == "lbs": calcweight = round(weight * 0.4536, 2)
         if unit == "jin": calcweight = round(weight * 0.5, 2)
         if unit == "kg": calcweight = weight
@@ -313,6 +351,11 @@ class ScanProcessor():
             raise
 
 def main():
+    """
+    Main function.
+
+    Args:
+    """
     if MQTT_DISCOVERY:
         discovery()
     BluetoothFailCounter = 0
