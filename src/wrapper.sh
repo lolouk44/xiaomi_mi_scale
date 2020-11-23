@@ -1,5 +1,6 @@
 #!/bin/bash
 
+sleep 60                      # Give the system time after a reboot to connect to WiFi before continuing
 export MISCALE_MAC=00:00:00:00:00:00 # Mac address of your scale
 export MQTT_PREFIX=miScale
 
