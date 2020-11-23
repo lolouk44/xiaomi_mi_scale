@@ -1,3 +1,7 @@
+## [0.1.12] - 2020-11-23
+### Changed
+- Updated workflow to automatically build docker images on new releases with version and latest tags
+
 ## [0.1.11] - 2020-11-23
 ### Changed
 - Remove additional logging for Scale V1 that was used for testing
