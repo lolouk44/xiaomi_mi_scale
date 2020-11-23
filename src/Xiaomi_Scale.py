@@ -193,7 +193,7 @@ OLD_MEASURE = ''
 def discovery():
     for MQTTUser in (USER1_NAME,USER2_NAME,USER3_NAME):
         message = '{"name": "' + MQTTUser + ' Weight",'
-        message+= '"state_topic": "miscale/' + MQTTUser + '/weight","value_template": "{{ value_json.weight }}","unit_of_measurement": "kg",'
+        message+= '"state_topic": "' + MQTT_PREFIX + '/' + MQTTUser + '/weight","value_template": "{{ value_json.weight }}"'
         message+= '"json_attributes_topic": "miscale/' + MQTTUser + '/weight","icon": "mdi:scale-bathroom"}'
         publish.single(
                         MQTT_DISCOVERY_PREFIX + '/sensor/' + MQTT_PREFIX + '/' + MQTTUser + '/config',
@@ -222,16 +222,14 @@ class ScanProcessor():
                 ### Xiaomi V1 Scale ###
                 if data.startswith('1d18') and sdid == 22:
                     measunit = data[4:6]
-                    sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Measuring Unit: {measunit}\n")
                     measured = int((data[8:10] + data[6:8]), 16) * 0.01
-                    sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Measured Raw Weight: {measured}\n")
                     unit = ''
                     if measunit.startswith(('03', 'a3')): unit = 'lbs'
                     if measunit.startswith(('12', 'b2')): unit = 'jin'
                     if measunit.startswith(('22', 'a2')): unit = 'kg' ; measured = measured / 2
                     if unit:
                         if OLD_MEASURE != round(measured, 2):
-                            self._publish(round(measured, 2), unit, str(datetime.today().strftime('%Y-%m-%d-%H:%M:%S')), "", "")
+                            self._publish(round(measured, 2), unit, str(datetime.now()), "", "")
                             OLD_MEASURE = round(measured, 2)
 
                 ### Xiaomi V2 Scale ###
@@ -250,7 +248,7 @@ class ScanProcessor():
                     miimpedance = str(int((data[24:26] + data[22:24]), 16))
                     if unit and isStabilized:
                         if OLD_MEASURE != round(measured, 2) + int(miimpedance):
-                            self._publish(round(measured, 2), unit, str(datetime.today().strftime('%Y-%m-%d-%H:%M:%S')), hasImpedance, miimpedance)
+                            self._publish(round(measured, 2), unit, str(datetime.now()), hasImpedance, miimpedance)
                             OLD_MEASURE = round(measured, 2) + int(miimpedance)
 
 
