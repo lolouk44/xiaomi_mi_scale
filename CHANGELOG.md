@@ -1,3 +1,7 @@
+## [0.1.14] - 2020-11-26
+### Changed
+- Reduced docker image size
+
 ## [0.1.13] - 2020-11-26
 ### Changed
 - Fixed MQTT Discovery Message
