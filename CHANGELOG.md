@@ -1,7 +1,3 @@
-## [0.1.13] - 2020-11-26
-### Changed
-- Fixed MQTT Discovery Message
-
 ## [0.1.12] - 2020-11-23
 ### Changed
 - Updated workflow to automatically build docker images on new releases with version and latest tags
