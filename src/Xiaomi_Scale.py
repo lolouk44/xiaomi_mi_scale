@@ -54,6 +54,16 @@ try:
             MQTT_PORT = 1883
             pass
         try:
+            MQTT_TLS_CACERTS = data["MQTT_TLS_CACERTS"]
+        except:
+            MQTT_TLS_CACERTS = None
+            pass
+        try:
+            MQTT_TLS_INSECURE = data["MQTT_TLS_INSECURE"]
+        except:
+            MQTT_TLS_INSECURE = None
+            pass
+        try:
             MQTT_PREFIX = data["MQTT_PREFIX"]
         except:
             MQTT_PREFIX = "miscale"
@@ -159,6 +169,8 @@ except FileNotFoundError:
     MQTT_PASSWORD = os.getenv('MQTT_PASSWORD', None)
     MQTT_HOST = os.getenv('MQTT_HOST', '127.0.0.1')
     MQTT_PORT = int(os.getenv('MQTT_PORT', 1883))
+    MQTT_TLS_CACERTS = os.getenv('MQTT_TLS_CACERTS', None)
+    MQTT_TLS_INSECURE = os.getenv('MQTT_TLS_INSECURE', None)
     MQTT_PREFIX = os.getenv('MQTT_PREFIX', 'miscale')
     TIME_INTERVAL = int(os.getenv('TIME_INTERVAL', 30))
     MQTT_DISCOVERY = os.getenv('MQTT_DISCOVERY',True)
@@ -188,6 +200,11 @@ except FileNotFoundError:
     USER3_DOB = os.getenv('USER3_DOB', '1988-01-01') # DOB (in yyyy-mm-dd format)
     sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Config Loaded...\n")
 
+if MQTT_TLS_CACERTS is None:
+    MQTT_TLS = None
+else:
+    MQTT_TLS = {'ca_certs':MQTT_TLS_CACERTS, 'insecure':MQTT_TLS_INSECURE}
+
 OLD_MEASURE = ''
 
 def discovery():
@@ -201,7 +218,8 @@ def discovery():
                         retain=True,
                         hostname=MQTT_HOST,
                         port=MQTT_PORT,
-                        auth={'username':MQTT_USERNAME, 'password':MQTT_PASSWORD}
+                        auth={'username':MQTT_USERNAME, 'password':MQTT_PASSWORD},
+                        tls=MQTT_TLS
                     )
     sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Discovery Completed...\n")
 
@@ -303,7 +321,8 @@ class ScanProcessor():
                 retain=True,
                 hostname=MQTT_HOST,
                 port=MQTT_PORT,
-                auth={'username':MQTT_USERNAME, 'password':MQTT_PASSWORD}
+                auth={'username':MQTT_USERNAME, 'password':MQTT_PASSWORD},
+                tls=MQTT_TLS
             )
             sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Data Published ...\n")
         except Exception as error:
