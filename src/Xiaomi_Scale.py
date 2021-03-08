@@ -49,6 +49,11 @@ try:
             sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - MQTT Host not provided...\n")
             raise
         try:
+            MQTT_RETAIN = data["MQTT_RETAIN"]
+        except:
+            MQTT_RETAIN = True
+            pass
+        try:
             MQTT_PORT = int(data["MQTT_PORT"])
         except:
             MQTT_PORT = 1883
@@ -168,6 +173,11 @@ except FileNotFoundError:
     MQTT_USERNAME = os.getenv('MQTT_USERNAME', 'username')
     MQTT_PASSWORD = os.getenv('MQTT_PASSWORD', None)
     MQTT_HOST = os.getenv('MQTT_HOST', '127.0.0.1')
+    MQTT_RETAIN = os.getenv('MQTT_RETAIN', True)
+    if MQTT_RETAIN.lower() in ['true', '1', 'y', 'yes']:
+        MQTT_RETAIN = True
+    else:
+        MQTT_RETAIN = False
     MQTT_PORT = int(os.getenv('MQTT_PORT', 1883))
     MQTT_TLS_CACERTS = os.getenv('MQTT_TLS_CACERTS', None)
     MQTT_TLS_INSECURE = os.getenv('MQTT_TLS_INSECURE', None)
@@ -318,7 +328,7 @@ class ScanProcessor():
                 MQTT_PREFIX + '/' + user + '/weight',
                 message,
                 # qos=1, #Removed qos=1 as incorrect connection details will result in the client waiting for ack from broker
-                retain=True,
+                retain=MQTT_RETAIN,
                 hostname=MQTT_HOST,
                 port=MQTT_PORT,
                 auth={'username':MQTT_USERNAME, 'password':MQTT_PASSWORD},

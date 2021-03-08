@@ -61,6 +61,7 @@ services:
     - MQTT_USERNAME=                # Username for MQTT server (comment out if not required)
     - MQTT_PASSWORD=                # Password for MQTT (comment out if not required)
     - MQTT_PORT=                    # Defaults to 1883
+    - MQTT_RETAIN=true              # MQTT Retain Option, defaults to true
     - MQTT_TLS_CACERTS=             # MQTT TLS connection: directory with CA certificate(s) that signed MQTT Server's TLS certificate, defaults to None (= no TLS connection)
     - MQTT_TLS_INSECURE=            # MQTT TLS connection: don't verify hostname in TLS certificate, defaults to None (= always check hostname)
     - TIME_INTERVAL=30              # Time in sec between each query to the scale, to allow other applications to use the Bluetooth module. Defaults to 30
