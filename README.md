@@ -139,4 +139,4 @@ Thanks to @syssi (https://gist.github.com/syssi/4108a54877406dc231d95514e538bde9
 
 Special thanks to [@ned-kelly](https://github.com/ned-kelly) for his help turning a "simple" python script into a fully fledged docker container
 
-Thanks to [@bpaulin](https://github.com/bpaulin), [@AiiR42](https://github.com/AiiR42) for their PRs and collaboration
+Thanks to [@bpaulin](https://github.com/bpaulin), [@AiiR42](https://github.com/AiiR42), [@andreasbrett](https://github.com/andreasbrett) for their PRs and collaboration
