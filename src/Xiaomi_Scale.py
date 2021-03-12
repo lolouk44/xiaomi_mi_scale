@@ -183,7 +183,7 @@ except FileNotFoundError:
     MQTT_TLS_INSECURE = os.getenv('MQTT_TLS_INSECURE', None)
     MQTT_PREFIX = os.getenv('MQTT_PREFIX', 'miscale')
     TIME_INTERVAL = int(os.getenv('TIME_INTERVAL', 30))
-    MQTT_DISCOVERY = os.getenv('MQTT_DISCOVERY',True)
+    MQTT_DISCOVERY = os.getenv('MQTT_DISCOVERY', 'true')
     if MQTT_DISCOVERY.lower() in ['true', '1', 'y', 'yes']:
         MQTT_DISCOVERY = True
     else:
