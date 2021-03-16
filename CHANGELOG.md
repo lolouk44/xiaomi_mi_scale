@@ -1,3 +1,7 @@
+## [0.1.16] - 2021-03-16
+### Changed
+- Fixed MQTT Retain defaults
+
 ## [0.1.15] - 2021-03-12
 ### Changed
 - Added MQTT Retain Option ([fixes #44](https://github.com/lolouk44/xiaomi_mi_scale/issues/44))
