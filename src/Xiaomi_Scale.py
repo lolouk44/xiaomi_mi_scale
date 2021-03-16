@@ -173,7 +173,7 @@ except FileNotFoundError:
     MQTT_USERNAME = os.getenv('MQTT_USERNAME', 'username')
     MQTT_PASSWORD = os.getenv('MQTT_PASSWORD', None)
     MQTT_HOST = os.getenv('MQTT_HOST', '127.0.0.1')
-    MQTT_RETAIN = os.getenv('MQTT_RETAIN', True)
+    MQTT_RETAIN = os.getenv('MQTT_RETAIN', 'true')
     if MQTT_RETAIN.lower() in ['true', '1', 'y', 'yes']:
         MQTT_RETAIN = True
     else:
