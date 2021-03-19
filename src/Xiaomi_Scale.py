@@ -12,6 +12,9 @@ from bluepy.btle import Scanner, BTLEDisconnectError, BTLEManagementError, Defau
 import paho.mqtt.publish as publish
 from datetime import datetime
 import json
+from types import SimpleNamespace
+from collections import namedtuple
+from json import JSONEncoder
 
 import Xiaomi_Scale_Body_Metrics
 
@@ -21,6 +24,14 @@ import Xiaomi_Scale_Body_Metrics
 sys.stdout.write(' \n')
 sys.stdout.write('-------------------------------------\n')
 sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Starting Xiaomi mi Scale...\n")
+
+# User Config
+class USER:
+    def __init__(self, name, gt, lt, sex, height, dob):
+        self.NAME, self.GT, self.LT, self.SEX, self.HEIGHT, self.DOB
+
+def customUserDecoder(userDict):
+    return namedtuple('USER', userDict.keys())(*userDict.values())
 
 # Configuraiton...
 # Trying To Load Config From options.json (HA Add-On)
@@ -94,136 +105,38 @@ try:
             HCI_DEV = "hci0"[-1]
             pass
         try:
-            USER1_GT = int(data["USER1_GT"])
+            BLUEPY_PASSIVE_SCAN = data["BLUEPY_PASSIVE_SCAN"]
         except:
-            sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - USER1_GT not provided...\n")
-            raise
-        try:
-            USER1_SEX = data["USER1_SEX"]
-        except:
-            sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - USER1_SEX not provided...\n")
-            raise
-        try:
-            USER1_NAME = data["USER1_NAME"]
-        except:
-            sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - USER1_NAME not provided...\n")
-            raise
-        try:
-            USER1_HEIGHT = int(data["USER1_HEIGHT"])
-        except:
-            sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - USER1_HEIGHT not provided...\n")
-            raise
-        try:
-            USER1_DOB = data["USER1_DOB"]
-        except:
-            sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - USER1_DOB not provided...\n")
-            raise
-        try:
-            USER2_LT = int(data["USER2_LT"])
-        except:
-            USER2_LT = USER1_GT
+            BLUEPY_PASSIVE_SCAN = False
             pass
-        try:
-            USER2_SEX = data["USER2_SEX"]
-        except:
-            USER2_SEX = "female"
-            pass
-        try:
-            USER2_NAME = data["USER2_NAME"]
-        except:
-            USER2_NAME = "Serena"
-            pass
-        try:
-            USER2_HEIGHT = int(data["USER2_HEIGHT"])
-        except:
-            USER2_HEIGHT = 95
-            pass
-        try:
-            USER2_DOB = data["USER2_DOB"]
-        except:
-            USER2_DOB = "1990-01-01"
-            pass
-        try:
-            USER3_SEX = data["USER3_SEX"]
-        except:
-            USER3_SEX = "female"
-            pass
-        try:
-            USER3_NAME = data["USER3_NAME"]
-        except:
-            USER3_NAME = "Missy"
-            pass
-        try:
-            USER3_HEIGHT = int(data["USER3_HEIGHT"])
-        except:
-            USER3_HEIGHT = 150
-            pass
-        try:
-            USER3_DOB = data["USER3_DOB"]
-        except:
-            USER3_DOB = "1990-01-01"
-            pass
-        sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Config Loaded...\n")
+
+        USERS = []
+        for user in data["USERS"]:    
+            try:
+                user = json.dumps(user)
+                user = json.loads(user, object_hook=customUserDecoder)
+                if user.GT > user.LT:
+                    raise ValueError("GT can not be larger than LT - user {user.Name}")  
+                USERS.append(user)
+            except:
+                sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {sys.exc_info()[1]}\n")
+                raise
+sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Config Loaded...\n")
 
 # Failed to open options.json, Loading Config From Environment (Not HA Add-On)
 except FileNotFoundError:
-    pass
-    sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Loading Config From OS Environment...\n")
-    MISCALE_MAC = os.getenv('MISCALE_MAC', '')
-    MQTT_USERNAME = os.getenv('MQTT_USERNAME', 'username')
-    MQTT_PASSWORD = os.getenv('MQTT_PASSWORD', None)
-    MQTT_HOST = os.getenv('MQTT_HOST', '127.0.0.1')
-    MQTT_RETAIN = os.getenv('MQTT_RETAIN', 'true')
-    if MQTT_RETAIN.lower() in ['true', '1', 'y', 'yes']:
-        MQTT_RETAIN = True
-    else:
-        MQTT_RETAIN = False
-    MQTT_PORT = int(os.getenv('MQTT_PORT', 1883))
-    MQTT_TLS_CACERTS = os.getenv('MQTT_TLS_CACERTS', None)
-    MQTT_TLS_INSECURE = os.getenv('MQTT_TLS_INSECURE', None)
-    MQTT_PREFIX = os.getenv('MQTT_PREFIX', 'miscale')
-    TIME_INTERVAL = int(os.getenv('TIME_INTERVAL', 30))
-    MQTT_DISCOVERY = os.getenv('MQTT_DISCOVERY', 'true')
-    if MQTT_DISCOVERY.lower() in ['true', '1', 'y', 'yes']:
-        MQTT_DISCOVERY = True
-    else:
-        MQTT_DISCOVERY = False
-    MQTT_DISCOVERY_PREFIX = os.getenv('MQTT_DISCOVERY_PREFIX','homeassistant')
-    HCI_DEV = os.getenv('HCI_DEV', 'hci0')[-1]
-
-    # User Variables...
-    USER1_GT = int(os.getenv('USER1_GT', '70')) # If the weight is greater than this number, we'll assume that we're weighing User #1
-    USER1_SEX = os.getenv('USER1_SEX', 'male')
-    USER1_NAME = os.getenv('USER1_NAME', 'David') # Name of the user
-    USER1_HEIGHT = int(os.getenv('USER1_HEIGHT', '175')) # Height (in cm) of the user
-    USER1_DOB = os.getenv('USER1_DOB', '1988-09-30') # DOB (in yyyy-mm-dd format)
-
-    USER2_LT = int(os.getenv('USER2_LT', '55')) # If the weight is less than this number, we'll assume that we're weighing User #2
-    USER2_SEX = os.getenv('USER2_SEX', 'female')
-    USER2_NAME = os.getenv('USER2_NAME', 'Joanne') # Name of the user
-    USER2_HEIGHT = int(os.getenv('USER2_HEIGHT', '155')) # Height (in cm) of the user
-    USER2_DOB = os.getenv('USER2_DOB', '1988-10-20') # DOB (in yyyy-mm-dd format)
-
-    USER3_SEX = os.getenv('USER3_SEX', 'male')
-    USER3_NAME = os.getenv('USER3_NAME', 'Unknown User') # Name of the user
-    USER3_HEIGHT = int(os.getenv('USER3_HEIGHT', '175')) # Height (in cm) of the user
-    USER3_DOB = os.getenv('USER3_DOB', '1988-01-01') # DOB (in yyyy-mm-dd format)
-    sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Config Loaded...\n")
-
-if MQTT_TLS_CACERTS is None:
-    MQTT_TLS = None
-else:
-    MQTT_TLS = {'ca_certs':MQTT_TLS_CACERTS, 'insecure':MQTT_TLS_INSECURE}
+    sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - options.json file missing... {error}\n")
+    raise
 
 OLD_MEASURE = ''
 
 def discovery():
-    for MQTTUser in (USER1_NAME,USER2_NAME,USER3_NAME):
-        message = '{"name": "' + MQTTUser + ' Weight",'
-        message+= '"state_topic": "' + MQTT_PREFIX + '/' + MQTTUser + '/weight","value_template": "{{ value_json.weight }}",'
-        message+= '"json_attributes_topic": "' + MQTT_PREFIX + '/' + MQTTUser + '/weight","icon": "mdi:scale-bathroom"}'
+    for MQTTUser in (USERS):
+        message = '{"name": "' + MQTTUser.NAME + ' Weight",'
+        message+= '"state_topic": "' + MQTT_PREFIX + '/' + MQTTUser.NAME + '/weight","value_template": "{{ value_json.weight }}",'
+        message+= '"json_attributes_topic": "' + MQTT_PREFIX + '/' + MQTTUser.NAME + '/weight","icon": "mdi:scale-bathroom"}'
         publish.single(
-                        MQTT_DISCOVERY_PREFIX + '/sensor/' + MQTT_PREFIX + '/' + MQTTUser + '/config',
+                        MQTT_DISCOVERY_PREFIX + '/sensor/' + MQTT_PREFIX + '/' + MQTTUser.NAME + '/config',
                         message,
                         retain=True,
                         hostname=MQTT_HOST,
@@ -233,6 +146,8 @@ def discovery():
                     )
     sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Discovery Completed...\n")
 
+def check_weight(user, weight):
+    return weight > user.GT and weight < user.LT
 
 class ScanProcessor():
     def GetAge(self, d1):
@@ -272,7 +187,6 @@ class ScanProcessor():
                     unit = ''
                     if measunit == "03": unit = 'lbs'
                     if measunit == "02": unit = 'kg' ; measured = measured / 2
-                    #mitdatetime = datetime.strptime(str(int((data[10:12] + data[8:10]), 16)) + " " + str(int((data[12:14]), 16)) +" "+ str(int((data[14:16]), 16)) +" "+ str(int((data[16:18]), 16)) +" "+ str(int((data[18:20]), 16)) +" "+ str(int((data[20:22]), 16)), "%Y %m %d %H %M %S")
                     miimpedance = str(int((data[24:26] + data[22:24]), 16))
                     if unit and isStabilized:
                         if OLD_MEASURE != round(measured, 2) + int(miimpedance):
@@ -284,21 +198,17 @@ class ScanProcessor():
         if unit == "lbs": calcweight = round(weight * 0.4536, 2)
         if unit == "jin": calcweight = round(weight * 0.5, 2)
         if unit == "kg": calcweight = weight
-        if int(calcweight) > USER1_GT:
-            user = USER1_NAME
-            height = USER1_HEIGHT
-            age = self.GetAge(USER1_DOB)
-            sex = USER1_SEX
-        elif int(calcweight) < USER2_LT:
-            user = USER2_NAME
-            height = USER2_HEIGHT
-            age = self.GetAge(USER2_DOB)
-            sex = USER2_SEX
-        else:
-            user = USER3_NAME
-            height = USER3_HEIGHT
-            age = self.GetAge(USER3_DOB)
-            sex = USER3_SEX
+        matcheduser = None
+        for user in USERS:
+            if(check_weight(user,calcweight)):
+                matcheduser = user
+                break
+        if matcheduser is None:
+            return
+        height = matcheduser.HEIGHT
+        age = self.GetAge(matcheduser.DOB)
+        sex = matcheduser.SEX.lower()
+        name = matcheduser.NAME
 
         lib = Xiaomi_Scale_Body_Metrics.bodyMetrics(calcweight, height, age, sex, 0)
         message = '{'
@@ -323,11 +233,10 @@ class ScanProcessor():
         message += ',"timestamp":"' + mitdatetime + '"'
         message += '}'
         try:
-            sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Publishing data to topic {MQTT_PREFIX + '/' + user + '/weight'}: {message}\n")
+            sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Publishing data to topic {MQTT_PREFIX + '/' + name + '/weight'}: {message}\n")
             publish.single(
-                MQTT_PREFIX + '/' + user + '/weight',
+                MQTT_PREFIX + '/' + name + '/weight',
                 message,
-                # qos=1, #Removed qos=1 as incorrect connection details will result in the client waiting for ack from broker
                 retain=MQTT_RETAIN,
                 hostname=MQTT_HOST,
                 port=MQTT_PORT,
@@ -346,7 +255,10 @@ def main():
     while True:
         try:
             scanner = btle.Scanner(HCI_DEV).withDelegate(ScanProcessor())
-            scanner.scan(5) # Adding passive=True to try and fix issues on RPi devices
+            if BLUEPY_PASSIVE_SCAN:
+                scanner.scan(5, passive=True) #passive=True to try and fix issues for bluepy on RPi devices
+            else:
+                scanner.scan(5)
         except BTLEDisconnectError as error:
             sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - btle disconnected: {error}\n")
             pass
