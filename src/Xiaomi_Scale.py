@@ -121,9 +121,9 @@ try:
             except:
                 sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {sys.exc_info()[1]}\n")
                 raise
-sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Config Loaded...\n")
+        sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Config Loaded...\n")
 
-# Failed to open options.json, Loading Config From Environment (Not HA Add-On)
+# Failed to open options.json
 except FileNotFoundError:
     sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - options.json file missing... {error}\n")
     raise
