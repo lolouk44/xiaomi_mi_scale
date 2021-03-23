@@ -37,8 +37,8 @@ def customUserDecoder(userDict):
 # Trying To Load Config From options.json (HA Add-On)
 try:
     with open('/data/options.json') as json_file:
-        sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Loading Config From Add-On Options...\n")
-        data = json.load(json_file)
+        sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Loading Config From Options.json...\n")
+        data = json.load(json_file)["options"]
         try:
             MISCALE_MAC = data["MISCALE_MAC"]
         except:
@@ -109,6 +109,11 @@ try:
         except:
             BLUEPY_PASSIVE_SCAN = False
             pass
+
+        if MQTT_TLS_CACERTS is None:
+            MQTT_TLS = None
+        else:
+            MQTT_TLS = {'ca_certs':MQTT_TLS_CACERTS, 'insecure':MQTT_TLS_INSECURE}
 
         USERS = []
         for user in data["USERS"]:    
