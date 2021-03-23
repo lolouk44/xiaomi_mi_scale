@@ -3,13 +3,9 @@
 Code to read weight measurements from Xiaomi Body Scales.
 
 ## BREAKING CHANGE:
-Please note there was a breaking change in 0.1.8. The MQTT message json attributes are now in lower snake_case to be compliant with Home-Assistant Attributes.
-This means Home-Assistant sensor configuration needs to be adjusted.
-For example 
-`value_template: "{{ value_json['Weight'] }}"`
-Needs to be replaced with
-`value_template: "{{ value_json['weight'] }}"`
-(note the lowercase `w` in `weight`)
+Please note that as off 0.2.0, the config is now located in options.json and no longer in the docker-compose / environment
+Please read on for for more information.
+This change was necessary to allow for unlimited number of users.
 
 ## Supported Scales:
 Name | Model | Picture
@@ -52,53 +48,53 @@ services:
 
     network_mode: host
     privileged: true
-
-    environment:
-    - HCI_DEV=hci0                  # Bluetooth hci device to use. Defaults to hci0
-    - MISCALE_MAC=00:00:00:00:00:00 # Mac address of your scale
-    - MQTT_HOST=127.0.0.1           # MQTT Server (defaults to 127.0.0.1)
-    - MQTT_PREFIX=miscale           # MQTT Topic Prefix. Defaults to miscale
-    - MQTT_USERNAME=                # Username for MQTT server (comment out if not required)
-    - MQTT_PASSWORD=                # Password for MQTT (comment out if not required)
-    - MQTT_PORT=                    # Defaults to 1883
-    - MQTT_RETAIN=true              # MQTT Retain Option, defaults to true
-    - MQTT_TLS_CACERTS=             # MQTT TLS connection: directory with CA certificate(s) that signed MQTT Server's TLS certificate, defaults to None (= no TLS connection)
-    - MQTT_TLS_INSECURE=            # MQTT TLS connection: don't verify hostname in TLS certificate, defaults to None (= always check hostname)
-    - TIME_INTERVAL=30              # Time in sec between each query to the scale, to allow other applications to use the Bluetooth module. Defaults to 30
-    - MQTT_DISCOVERY=true           # Home Assistant Discovery (true/false), defaults to true
-    - MQTT_DISCOVERY_PREFIX=        # Home Assistant Discovery Prefix, defaults to homeassistant
-
-      # Auto-gender selection/config -- This is used to create the calculations such as BMI, Water/Bone Mass etc...
-      # Up to 3 users possible as long as weights do not overlap!
-
-
-      # Here is the logic used to assign a measured weight to a user:
-      # if [measured value in kg] is greater than USER1_GT, assign it to USER1
-      # else if [measured value in kg] is less than USER2_LT, assign it to USER2
-      # else assign it to USER3 (e.g. USER2_LT < [measured value in kg] < USER1_GT)
-
-    - USER1_GT=70                   # If the weight (in kg) is greater than this number, we'll assume that we're weighing User #1
-    - USER1_SEX=male                # male / female
-    - USER1_NAME=Jo                 # Name of the user
-    - USER1_HEIGHT=175              # Height (in cm) of the user
-    - USER1_DOB=1990-01-01          # DOB (in yyyy-mm-dd format)
-
-    - USER2_LT=35                   # If the weight (in kg) is less than this number, we'll assume that we're weighing User #2
-    - USER2_SEX=female              # male / female
-    - USER2_NAME=Serena             # Name of the user
-    - USER2_HEIGHT=95               # Height (in cm) of the user
-    - USER2_DOB=1990-01-01          # DOB (in yyyy-mm-dd format)
-
-    - USER3_SEX=female              # male / female
-    - USER3_NAME=Missy              # Name of the user
-    - USER3_HEIGHT=150              # Height (in cm) of the user
-    - USER3_DOB=1990-01-01          # DOB (in yyyy-mm-dd format)
+    volumes:
+      - ./data:/data
 ```
+### options.json:
+All the config needs to be in a file named `options.json`. You can get a copy of one with minimum config [here](./options.json)
 
+List of options
 
-### Running script directly on your host system (if your platform is not listed/supported):
+Option | Type | Required | Description
+--- | --- | --- | ---
+MISCALE_MAC | string | Yes | Mac address of your scale
+MQTT_HOST | string | Yes | MQTT Server (defaults to 127.0.0.1)
+HCI_DEV | string | No | Bluetooth hci device to use. Defaults to hci0
+MQTT_PREFIX | string | No | MQTT Topic Prefix. Defaults to miscale
+MQTT_USERNAME | string | No | Username for MQTT server (comment out if not required)
+MQTT_PASSWORD | string | No | Password for MQTT (comment out if not required)
+MQTT_PORT | int | No | Defaults to 1883
+MQTT_DISCOVERY | bool | No | MQTT Discovery for Home Assistant Defaults to true
+MQTT_DISCOVERY_PREFIX | string | No | MQTT Discovery Prefix for Home Assistant. Defaults to homeassistant
+MQTT_TLS_CACERTS | string | No | MQTT TLS connection: directory with CA certificate(s) that signed MQTT Server's TLS certificate, defaults to None (= no TLS connection)
+MQTT_TLS_INSECURE | bool | No | MQTT TLS connection: don't verify hostname in TLS certificate, defaults to None (= always check hostname)
+BLUEPY_PASSIVE_SCAN | bool | No | Try to set to true if getting an error like `Bluetooth connection error: Failed to execute management command ‘le on’` on a Raspberry Pi. Defaults to false
+TIME_INTERVAL | int | No | Time in sec between each query to the scale, to allow other applications to use the Bluetooth module. Defaults to 30
+USERS | List | Yes | List of users to add
 
-**Note: Python 3.6 or higher is required to run the script manually**
+Auto-gender selection/config -- This is used to create the calculations such as BMI, Water/Bone Mass etc...
+Here is the logic used to assign a measured weight to a user:
+- If the weight is within the range of a user's defined values for GT and LT, then it will be assigned (published) to that user.
+- If the weight matches two separate user ranges, it will only be assigned to the first user that matched (so don't overlap ranges!)
+
+User Option | Type | Required | Description
+--- | --- | --- | ---
+GT | int | Yes | Greater Than - Weight must be greater than this value - this will be the lower limit for the weight range of this user
+LT | int | Yes | Less Than - Weight must be less than this value - this will be the upper limit for the weight range of this user
+SEX | string | Yes | male / female
+NAME | string | Yes | Name of the user
+HEIGHT | int | Yes | Height (in cm) of the user
+DOB | string | Yes | DOB (in yyyy-mm-dd format)
+
+Note: The weight definitions must be in the same unit as the scale (kg, Lbs, jin)
+
+### Running script directly on your host system:
+
+***Note: Python 3.6 or higher is required to run the script manually***
+
+***Note: this is now deprecated. It would still work provided the path to options.json is manually set in the code manually set path at line 39: `with open('/data/options.json') as json_file`***
+
 1. Install python requirements (pip3 install -r requirements.txt)
 1. Open `wrapper.sh` and configure your environment variables to suit your setup.
 1. Add a cron-tab entry to wrapper like so:
