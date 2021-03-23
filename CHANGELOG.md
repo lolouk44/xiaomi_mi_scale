@@ -1,3 +1,11 @@
+## [0.2.0] - 2021-03-23
+### Breaking Changes
+Please note that as off 0.2.0, the config is now located in options.json and no longer in the docker-compose / environment. Be sure to check the [Doc](https://github.com/lolouk44/xiaomi_mi_scale/blob/master/README.md) for more information. This change was necessary to allow for unlimited number of users.
+### Changed
+- Unlimited users ! This unfortunately comes with a breaking change. Be sure to check the [Doc](https://github.com/lolouk44/xiaomi_mi_scale/blob/master/README.md) for more information
+### Added
+- Added BLUEPY_PASSIVE_SCAN Option for Raspberry Pi users experiencing Bluetooth troubles (in case you're not using the [add-on](https://github.com/lolouk44/hassio-addons/tree/master/mi-scale))
+
 ## [0.1.16] - 2021-03-16
 ### Changed
 - Fixed MQTT Retain defaults
