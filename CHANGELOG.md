@@ -1,3 +1,7 @@
+## [0.2.1] - 2021-05-13
+### Changed
+- Fixed user lookup by non kg weight
+
 ## [0.2.0] - 2021-03-23
 ### Breaking Changes
 Please note that as off 0.2.0, the config is now located in options.json and no longer in the docker-compose / environment. Be sure to check the [Doc](https://github.com/lolouk44/xiaomi_mi_scale/blob/master/README.md) for more information. This change was necessary to allow for unlimited number of users.
