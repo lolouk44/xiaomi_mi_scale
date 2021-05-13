@@ -205,7 +205,7 @@ class ScanProcessor():
         if unit == "kg": calcweight = weight
         matcheduser = None
         for user in USERS:
-            if(check_weight(user,calcweight)):
+            if(check_weight(user,weight)):
                 matcheduser = user
                 break
         if matcheduser is None:
