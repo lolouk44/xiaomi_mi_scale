@@ -1,3 +1,7 @@
+## [0.2.2] - 2021-06-28
+### Changed
+- Fixed handling of MQTT_PORT and TIME_INTERVAL
+
 ## [0.2.1] - 2021-05-13
 ### Changed
 - Fixed user lookup by non kg weight
