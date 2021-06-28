@@ -65,7 +65,10 @@ try:
             MQTT_RETAIN = True
             pass
         try:
-            MQTT_PORT = int(data["MQTT_PORT"])
+            MQTT_PORT = data["MQTT_PORT"]
+            if(type(MQTT_PORT) != int):
+                sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - [Warning] Converting MQTT_PORT to integer...\n")
+                MQTT_PORT = int(MQTT_PORT)
         except:
             MQTT_PORT = 1883
             pass
@@ -85,7 +88,10 @@ try:
             MQTT_PREFIX = "miscale"
             pass
         try:
-            TIME_INTERVAL = int(data["TIME_INTERVAL"])
+            TIME_INTERVAL = data["TIME_INTERVAL"]
+            if(type(TIME_INTERVAL) != int):
+                sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - [Warning] Converting TIME_INTERVAL to integer...\n")
+                TIME_INTERVAL = int(TIME_INTERVAL)
         except:
             TIME_INTERVAL = 30
             pass
