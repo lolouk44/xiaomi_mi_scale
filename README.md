@@ -1,3 +1,4 @@
+[![version](https://img.shields.io/github/v/release/lolouk44/xiaomi_mi_scale)](https://github.com/lolouk44/xiaomi_mi_scale/releases)
 # Xiaomi Mi Scale
 
 Code to read weight measurements from Xiaomi Body Scales.
