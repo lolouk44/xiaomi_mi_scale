@@ -1,3 +1,8 @@
+## [0.2.3] - 2022-01-13
+### Added
+- Added support for Long Term Statistics (HA 2021.9 minimum required)
+- Impedance posted to MQTT ([fixes #56](https://github.com/lolouk44/hassio-addons/issues/56))
+
 ## [0.2.2] - 2021-06-28
 ### Changed
 - Fixed handling of MQTT_PORT and TIME_INTERVAL

@@ -108,7 +108,7 @@ Note: The weight definitions must be in the same unit as the scale (kg, Lbs, jin
 **NOTE**: Although once started the script runs continuously, it may take a few seconds for the data to be retrieved, computed and sent via mqtt.
 
 ## Home-Assistant Setup:
-Under the `sensor` block, enter as many blocks as users configured in your environment variables:
+Under the `sensor` block, enter as many blocks as users configured in your environment variables.
 
 ```yaml
   - platform: mqtt
@@ -118,6 +118,8 @@ Under the `sensor` block, enter as many blocks as users configured in your envir
     unit_of_measurement: "kg"
     json_attributes_topic: "miscale/USER_NAME/weight"
     icon: mdi:scale-bathroom
+    # Below lines only needed if long term statistics are required
+    state_class: "measurement"
 
   - platform: mqtt
     name: "Example Name BMI"
@@ -125,6 +127,8 @@ Under the `sensor` block, enter as many blocks as users configured in your envir
     value_template: "{{ value_json['bmi'] }}"
     icon: mdi:human-pregnant
     unit_of_measurement: "kg/m2"
+    # Below lines only needed if long term statistics are required
+    state_class: "measurement"
 
 ```
 
