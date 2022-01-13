@@ -6,7 +6,7 @@ COPY src /opt/miscale
 RUN apt-get update && apt-get install --no-install-recommends -y \
     build-essential \
     bluez \
-    python-pip \
+    python3-pip \
     libglib2.0-dev && \
     rm -rf /var/lib/apt/lists/*
 
