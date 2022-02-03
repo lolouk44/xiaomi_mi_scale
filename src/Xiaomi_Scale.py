@@ -186,7 +186,7 @@ class ScanProcessor():
                     if measunit.startswith(('22', 'a2')): unit = 'kg' ; measured = measured / 2
                     if unit:
                         if OLD_MEASURE != round(measured, 2):
-                            self._publish(round(measured, 2), unit, str(datetime.now()), "", "")
+                            self._publish(round(measured, 2), unit, str(datetime.now().strftime('%Y-%m-%dT%H:%M:%S+00:00')), "", "")
                             OLD_MEASURE = round(measured, 2)
 
                 ### Xiaomi V2 Scale ###
@@ -204,7 +204,7 @@ class ScanProcessor():
                     miimpedance = str(int((data[24:26] + data[22:24]), 16))
                     if unit and isStabilized:
                         if OLD_MEASURE != round(measured, 2) + int(miimpedance):
-                            self._publish(round(measured, 2), unit, str(datetime.now()), hasImpedance, miimpedance)
+                            self._publish(round(measured, 2), unit, str(datetime.now().strftime('%Y-%m-%dT%H:%M:%S+00:00')), hasImpedance, miimpedance)
                             OLD_MEASURE = round(measured, 2) + int(miimpedance)
 
 

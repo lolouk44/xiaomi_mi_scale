@@ -1,3 +1,7 @@
+## [0.2.4] - 2022-02-03
+### Changed
+- Changed time format for datestamp to contain timezone ([fixes #59](https://github.com/lolouk44/hassio-addons/issues/59))
+
 ## [0.2.3] - 2022-01-13
 ### Added
 - Added support for Long Term Statistics (HA 2021.9 minimum required)
