@@ -169,7 +169,7 @@ try:
                 sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - [Warning] Converting MISCALE_VERSION to integer...\n")
                 MISCALE_VERSION = int(MISCALE_VERSION)
         except:
-            MQTT_PORT = 1883
+            MISCALE_VERSION = 2
             pass
         try:
             MQTT_USERNAME = data["MQTT_USERNAME"]
