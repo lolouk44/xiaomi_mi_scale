@@ -1,3 +1,10 @@
+## [0.3.0] - 2022-09-15
+### Changed
+- Stopped using deprecated/no longer supported bluepy library and replaced with bleak, requiring major code overhaul. ([fixes #59](https://github.com/lolouk44/hassio-addons/issues/59))
+- Updated documentation to reflect MQTT integration (moved out of sensor config)
+### Breaking Changes
+If using a MiScale V1, make sure you add the MISCALE_VERSION to your options.json file (see doc)
+
 ## [0.2.4] - 2022-02-03
 ### Changed
 - Changed time format for datestamp to contain timezone ([fixes #59](https://github.com/lolouk44/hassio-addons/issues/59))

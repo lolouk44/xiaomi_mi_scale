@@ -61,6 +61,7 @@ List of options
 Option | Type | Required | Description
 --- | --- | --- | ---
 MISCALE_MAC | string | Yes | Mac address of your scale
+MISCALE_VERSION | int | No | `1` or `2` depending on the version of your scale, defaults to `2`
 MQTT_HOST | string | Yes | MQTT Server (defaults to 127.0.0.1)
 HCI_DEV | string | No | Bluetooth hci device to use. Defaults to hci0
 MQTT_PREFIX | string | No | MQTT Topic Prefix. Defaults to miscale
@@ -111,25 +112,24 @@ Note: The weight definitions must be in the same unit as the scale (kg, Lbs, jin
 Under the `sensor` block, enter as many blocks as users configured in your environment variables.
 
 ```yaml
-  - platform: mqtt
-    name: "Example Name Weight"
-    state_topic: "miscale/USER_NAME/weight"
-    value_template: "{{ value_json['weight'] }}"
-    unit_of_measurement: "kg"
-    json_attributes_topic: "miscale/USER_NAME/weight"
-    icon: mdi:scale-bathroom
-    # Below lines only needed if long term statistics are required
-    state_class: "measurement"
+mqtt:
+  sensor:
+    - name: "Example Name Weight"
+      state_topic: "miscale/USER_NAME/weight"
+      value_template: "{{ value_json['weight'] }}"
+      unit_of_measurement: "kg"
+      json_attributes_topic: "miscale/USER_NAME/weight"
+      icon: mdi:scale-bathroom
+      # Below lines only needed if long term statistics are required
+      state_class: "measurement"
 
-  - platform: mqtt
-    name: "Example Name BMI"
-    state_topic: "miscale/USER_NAME/weight"
-    value_template: "{{ value_json['bmi'] }}"
-    icon: mdi:human-pregnant
-    unit_of_measurement: "kg/m2"
-    # Below lines only needed if long term statistics are required
-    state_class: "measurement"
-
+    - name: "Example Name BMI"
+      state_topic: "miscale/USER_NAME/weight"
+      value_template: "{{ value_json['bmi'] }}"
+      icon: mdi:human-pregnant
+      unit_of_measurement: "kg/m2"
+      # Below lines only needed if long term statistics are required
+     state_class: "measurement"
 ```
 
 ![Mi Scale](Screenshots/HA_Lovelace_Card.png)
