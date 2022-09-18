@@ -281,12 +281,19 @@ async def main(address, char_uuid):
                 await client.stop_notify(BODY_COMPOSITION_MEASUREMENT)
                 await client.disconnect()
         except Exception as err:
-            if len(str(err)) == 0 or str(err)[0:24] == "[org.bluez.Error.Failed]" or str(err)[0:19] == "Device with address":
-                #sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Could Not Connect to Scale, Retrying...\n{err}\n")
-                await asyncio.sleep(10)
-            else:
-                sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Could Not Connect to Scale, Retrying...\n{err}\n")
-                await asyncio.sleep(10)
+            if str(err)[0:28] == "[org.bluez.Error.InProgress]" or str(err)[0:26] == "[org.bluez.Error.NotReady]":
+                sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Could Not Connect to Scale\n\t({err})\n\tTrying to Reset Bluetooth Adapter...\n")
+                sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Bluetooth Power Off...\n")
+                cmd = 'hciconfig power off' #hci' + HCI_DEV + ' down'
+                ps = subprocess.Popen(cmd, shell=True)
+                await asyncio.sleep(5)
+                sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Bluetooth Power On...\n")
+                cmd = 'hciconfig power on' #hci' + HCI_DEV + ' up'
+                ps = subprocess.Popen(cmd, shell=True)
+                sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Bluetooth Adapter Reset...\n")
+                await asyncio.sleep(5)
+            elif len(str(err)) != 0 and str(err)[0:24] != "[org.bluez.Error.Failed]" and str(err)[0:19] != "Device with address" and str(err) != "Not connected":
+                sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Could Not Connect to Scale, Retrying...\n\t{err}\n")
             pass
         
 if __name__ == "__main__":
