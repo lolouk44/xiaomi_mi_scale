@@ -281,8 +281,11 @@ async def main(address, char_uuid):
                 await client.stop_notify(BODY_COMPOSITION_MEASUREMENT)
                 await client.disconnect()
         except Exception as err:
-            sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Counld Not Connect to Scale, Retrying...\n{err}\n")
-            await asyncio.sleep(10)
+            if err.length() == 0 or err[0:23] == "[org.bluez.Error.Failed]" or err[0:18] == "Device with address":
+                await asyncio.sleep(10)
+            else:
+                sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Could Not Connect to Scale, Retrying...\n{err}\n")
+                await asyncio.sleep(10)
             pass
         
 if __name__ == "__main__":
