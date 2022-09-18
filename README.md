@@ -52,6 +52,7 @@ services:
     privileged: true
     volumes:
       - ./data:/data
+      - /var/run/dbus/:/var/run/dbus/:ro #needed for bleak
 ```
 ### options.json:
 All the config needs to be in a file named `options.json`. You can get a copy of one with minimum config [here](./options.json)

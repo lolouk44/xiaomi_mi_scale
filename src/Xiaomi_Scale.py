@@ -280,7 +280,9 @@ async def main(address, char_uuid):
                 await asyncio.sleep(10)
                 await client.stop_notify(BODY_COMPOSITION_MEASUREMENT)
                 await client.disconnect()
-        except:
+        except Exception as err:
+            sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Counld Not Connect to Scale, Retrying...\n{err}\n")
+            await asyncio.sleep(10)
             pass
         
 if __name__ == "__main__":
