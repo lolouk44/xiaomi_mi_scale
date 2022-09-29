@@ -2,12 +2,13 @@
 # -*- coding: utf-8 -*-
 import asyncio
 import binascii
-from bleak import BleakScanner, BleakClient
+from bleak import BleakScanner
 from collections import namedtuple
 from datetime import datetime
 import functools
 import json
 import paho.mqtt.publish as publish
+import subprocess
 import sys
 
 import Xiaomi_Scale_Body_Metrics
@@ -111,44 +112,6 @@ def MQTT_publish(weight, unit, mitdatetime, hasImpedance, miimpedance):
     except Exception as error:
         sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Could not publish to MQTT: {error}\n")
         raise
-
-def notification_handler(sender, data):
-    global OLD_MEASURE
-    """Simple notification handler which prints the data received."""
-    data = binascii.b2a_hex(data).decode('ascii')
-    #sys.stdout.write(f"Raw Data: {data}\n")
-    if MISCALE_VERSION == 1:
-    ### Xiaomi V1 Scale ###
-            data = "1d18" + data # although not technically needed, keeping this 'ID' may be required in the future to identify V1 Vs V2 scales
-            measunit = data[4:6]
-            measured = int((data[8:10] + data[6:8]), 16) * 0.01
-            unit = ''
-            if measunit.startswith(('03', 'a3')): unit = 'lbs'
-            if measunit.startswith(('12', 'b2')): unit = 'jin'
-            if measunit.startswith(('22', 'a2')): unit = 'kg' ; measured = measured / 2
-            # sys.stdout.write(f"Weight: {round(measured, 2)}\n")
-            if unit:
-                if OLD_MEASURE != round(measured, 2):
-                    OLD_MEASURE = round(measured, 2)
-                    MQTT_publish(round(measured, 2), unit, str(datetime.now().strftime('%Y-%m-%dT%H:%M:%S+00:00')), "", "")
-    else:
-        ### Xiaomi V2 Scale ###
-            data = "1b18" + data # although not technically needed, keeping this 'ID' may be required in the future to identify V1 Vs V2 scales
-            data2 = bytes.fromhex(data[4:])
-            ctrlByte1 = data2[1]
-            isStabilized = ctrlByte1 & (1<<5)
-            hasImpedance = ctrlByte1 & (1<<1)
-            measunit = data[4:6]
-            measured = int((data[28:30] + data[26:28]), 16) * 0.01
-            unit = ''
-            if measunit == "03": unit = 'lbs'
-            if measunit == "02": unit = 'kg' ; measured = measured / 2
-            miimpedance = str(int((data[24:26] + data[22:24]), 16))
-            # sys.stdout.write(f"Weight: {round(measured, 2)}\nStabilized: {isStabilized}\nhasImpedance: {hasImpedance}\nImpedance: {miimpedance}\n")
-            if unit and isStabilized:
-                if OLD_MEASURE != round(measured, 2) + int(miimpedance):
-                    OLD_MEASURE = round(measured, 2) + int(miimpedance)
-                    MQTT_publish(round(measured, 2), unit, str(datetime.now().strftime('%Y-%m-%dT%H:%M:%S+00:00')), hasImpedance, miimpedance)
 
 
 
@@ -267,36 +230,64 @@ except FileNotFoundError as error:
     sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - options.json file missing... {error}\n")
     raise
 
-async def main(address, char_uuid):
-    """Main routine."""
-    if MQTT_DISCOVERY:
-        MQTT_discovery()
-    sys.stdout.write('-------------------------------------\n')
-    sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Initialization Completed, Waiting for Scale...\n")
-    while True:
-        try:
-            async with BleakClient(address) as client:
-                await client.start_notify(BODY_COMPOSITION_MEASUREMENT, notification_handler)
-                await asyncio.sleep(10)
-                await client.stop_notify(BODY_COMPOSITION_MEASUREMENT)
-                await client.disconnect()
-        except Exception as err:
-            """if str(err)[0:28] == "[org.bluez.Error.InProgress]" or str(err)[0:26] == "[org.bluez.Error.NotReady]":
-                sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Could Not Connect to Scale\n\t({err})\n\tTrying to Reset Bluetooth Adapter...\n")
-                sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Bluetooth Power Off...\n")
-                cmd = 'hciconfig power off' #hci' + HCI_DEV + ' down'
-                ps = subprocess.Popen(cmd, shell=True)
-                await asyncio.sleep(5)
-                sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Bluetooth Power On...\n")
-                cmd = 'hciconfig power on' #hci' + HCI_DEV + ' up'
-                ps = subprocess.Popen(cmd, shell=True)
-                sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Bluetooth Adapter Reset...\n")
-                await asyncio.sleep(5)
-            elif len(str(err)) != 0 and str(err)[0:24] != "[org.bluez.Error.Failed]" and str(err)[0:19] != "Device with address" and str(err) != "Not connected":
-                sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Could Not Connect to Scale, Retrying...\n\t{err}\n")"""
-            sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Could Not Connect to Scale, Retrying...\n\t{err}\n")
-            pass
+async def main(MISCALE_MAC):
+    stop_event = asyncio.Event()
+
+    # TODO: add something that calls stop_event.set()
+
+    def callback(device, advertising_data):
+        global OLD_MEASURE
+        if device.address.lower() == MISCALE_MAC:
+            #print(f"miscale found, with advertising_data: {advertising_data}")
+            try:
+                device_name = advertising_data.local_name
+            except:
+                device_name = None
+                pass
+            data = binascii.b2a_hex(advertising_data.service_data['0000181b-0000-1000-8000-00805f9b34fb']).decode('ascii')
+            if device_name == "MIBCS":
+                ### Xiaomi V2 Scale ###
+                    data = "1b18" + data # although not technically needed, keeping this 'ID' may be required in the future to identify V1 Vs V2 scales
+                    data2 = bytes.fromhex(data[4:])
+                    ctrlByte1 = data2[1]
+                    isStabilized = ctrlByte1 & (1<<5)
+                    hasImpedance = ctrlByte1 & (1<<1)
+                    measunit = data[4:6]
+                    measured = int((data[28:30] + data[26:28]), 16) * 0.01
+                    unit = ''
+                    if measunit == "03": unit = 'lbs'
+                    if measunit == "02": unit = 'kg' ; measured = measured / 2
+                    miimpedance = str(int((data[24:26] + data[22:24]), 16))
+                    if unit and isStabilized:
+                        if OLD_MEASURE != round(measured, 2) + int(miimpedance):
+                            OLD_MEASURE = round(measured, 2) + int(miimpedance)
+                            MQTT_publish(round(measured, 2), unit, str(datetime.now().strftime('%Y-%m-%dT%H:%M:%S+00:00')), hasImpedance, miimpedance)
+            else:
+            ### Xiaomi V1 Scale ###
+                    data = "1d18" + data # although not technically needed, keeping this 'ID' may be required in the future to identify V1 Vs V2 scales
+                    measunit = data[4:6]
+                    measured = int((data[8:10] + data[6:8]), 16) * 0.01
+                    unit = ''
+                    if measunit.startswith(('03', 'a3')): unit = 'lbs'
+                    if measunit.startswith(('12', 'b2')): unit = 'jin'
+                    if measunit.startswith(('22', 'a2')): unit = 'kg' ; measured = measured / 2
+                    if unit:
+                        if OLD_MEASURE != round(measured, 2):
+                            OLD_MEASURE = round(measured, 2)
+                            MQTT_publish(round(measured, 2), unit, str(datetime.now().strftime('%Y-%m-%dT%H:%M:%S+00:00')), "", "")
+        pass
+
+    async with BleakScanner(callback) as scanner:
+        ...
+        # Important! Wait for an event to trigger stop, otherwise scanner
+        # will stop immediately.
+        await stop_event.wait()
+
         
 if __name__ == "__main__":
-    BODY_COMPOSITION_MEASUREMENT = "00002a9c-0000-1000-8000-00805f9b34fb"
-    asyncio.run(main(MISCALE_MAC, BODY_COMPOSITION_MEASUREMENT))
+    sys.stdout.write('-------------------------------------\n')
+    sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Initialization Completed, Waiting for Scale...\n")
+    try:
+        asyncio.run(main(MISCALE_MAC.lower()))
+    except:
+        pass
