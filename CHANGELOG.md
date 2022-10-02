@@ -1,4 +1,4 @@
-## [0.3.0] - 2022-09-18
+## [0.3.0] - 2022-10-02
 ### Changed
 - Stopped using deprecated/no longer supported bluepy library and replaced with bleak, requiring major code overhaul. ([fixes #59](https://github.com/lolouk44/hassio-addons/issues/59))
 - Updated documentation to reflect MQTT integration (moved out of sensor config)
