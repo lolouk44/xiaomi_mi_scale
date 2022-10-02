@@ -1,2 +1,2 @@
-bleak==0.17.0
+bleak==0.18.0
 paho-mqtt==1.5.0
