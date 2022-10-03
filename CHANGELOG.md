@@ -1,3 +1,7 @@
+## [0.3.3] - 2022-10-03
+### Changed
+- Restoring handling of V1 scales. ([fixes #64](https://github.com/lolouk44/hassio-addons/issues/64))
+
 ## [0.3.0] - 2022-10-02
 ### Changed
 - Stopped using deprecated/no longer supported bluepy library and replaced with bleak, requiring major code overhaul. ([fixes #59](https://github.com/lolouk44/hassio-addons/issues/59))

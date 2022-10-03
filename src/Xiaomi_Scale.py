@@ -244,37 +244,42 @@ async def main(MISCALE_MAC):
             except:
                 device_name = None
                 pass
-            data = binascii.b2a_hex(advertising_data.service_data['0000181b-0000-1000-8000-00805f9b34fb']).decode('ascii')
-            if device_name == "MIBCS":
+            try:
                 ### Xiaomi V2 Scale ###
-                    data = "1b18" + data # although not technically needed, keeping this 'ID' may be required in the future to identify V1 Vs V2 scales
-                    data2 = bytes.fromhex(data[4:])
-                    ctrlByte1 = data2[1]
-                    isStabilized = ctrlByte1 & (1<<5)
-                    hasImpedance = ctrlByte1 & (1<<1)
-                    measunit = data[4:6]
-                    measured = int((data[28:30] + data[26:28]), 16) * 0.01
-                    unit = ''
-                    if measunit == "03": unit = 'lbs'
-                    if measunit == "02": unit = 'kg' ; measured = measured / 2
-                    miimpedance = str(int((data[24:26] + data[22:24]), 16))
-                    if unit and isStabilized:
-                        if OLD_MEASURE != round(measured, 2) + int(miimpedance):
-                            OLD_MEASURE = round(measured, 2) + int(miimpedance)
-                            MQTT_publish(round(measured, 2), unit, str(datetime.now().strftime('%Y-%m-%dT%H:%M:%S+00:00')), hasImpedance, miimpedance)
-            else:
-            ### Xiaomi V1 Scale ###
-                    data = "1d18" + data # although not technically needed, keeping this 'ID' may be required in the future to identify V1 Vs V2 scales
-                    measunit = data[4:6]
-                    measured = int((data[8:10] + data[6:8]), 16) * 0.01
-                    unit = ''
-                    if measunit.startswith(('03', 'a3')): unit = 'lbs'
-                    if measunit.startswith(('12', 'b2')): unit = 'jin'
-                    if measunit.startswith(('22', 'a2')): unit = 'kg' ; measured = measured / 2
-                    if unit:
-                        if OLD_MEASURE != round(measured, 2):
-                            OLD_MEASURE = round(measured, 2)
-                            MQTT_publish(round(measured, 2), unit, str(datetime.now().strftime('%Y-%m-%dT%H:%M:%S+00:00')), "", "")
+                data = binascii.b2a_hex(advertising_data.service_data['0000181b-0000-1000-8000-00805f9b34fb']).decode('ascii')
+                data = "1b18" + data # Remnant from previous code. Needs to be cleaned in the future
+                data2 = bytes.fromhex(data[4:])
+                ctrlByte1 = data2[1]
+                isStabilized = ctrlByte1 & (1<<5)
+                hasImpedance = ctrlByte1 & (1<<1)
+                measunit = data[4:6]
+                measured = int((data[28:30] + data[26:28]), 16) * 0.01
+                unit = ''
+                if measunit == "03": unit = 'lbs'
+                if measunit == "02": unit = 'kg' ; measured = measured / 2
+                miimpedance = str(int((data[24:26] + data[22:24]), 16))
+                if unit and isStabilized:
+                    if OLD_MEASURE != round(measured, 2) + int(miimpedance):
+                        OLD_MEASURE = round(measured, 2) + int(miimpedance)
+                        MQTT_publish(round(measured, 2), unit, str(datetime.now().strftime('%Y-%m-%dT%H:%M:%S+00:00')), hasImpedance, miimpedance)
+            except:
+                pass
+            try:
+                ### Xiaomi V1 Scale ###
+                data = binascii.b2a_hex(advertising_data.service_data['0000181d-0000-1000-8000-00805f9b34fb']).decode('ascii')
+                data = "1d18" + data # Remnant from previous code. Needs to be cleaned in the future
+                measunit = data[4:6]
+                measured = int((data[8:10] + data[6:8]), 16) * 0.01
+                unit = ''
+                if measunit.startswith(('03', 'a3')): unit = 'lbs'
+                if measunit.startswith(('12', 'b2')): unit = 'jin'
+                if measunit.startswith(('22', 'a2')): unit = 'kg' ; measured = measured / 2
+                if unit:
+                    if OLD_MEASURE != round(measured, 2):
+                        OLD_MEASURE = round(measured, 2)
+                        MQTT_publish(round(measured, 2), unit, str(datetime.now().strftime('%Y-%m-%dT%H:%M:%S+00:00')), "", "")
+            except:
+                pass
         pass
 
     async with BleakScanner(callback) as scanner:
