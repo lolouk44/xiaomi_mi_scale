@@ -1,7 +1,7 @@
 {
   "options": {
     "MISCALE_MAC": "00:00:00:00:00:00",
-    "MQTT_HOST": "192.168.0.25",
+    "MQTT_HOST": "127.0.0.1",
     "MQTT_USERNAME": "user",
     "MQTT_PASSWORD": "passwd",
 

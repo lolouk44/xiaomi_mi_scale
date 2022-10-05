@@ -1,3 +1,8 @@
+## [0.3.4] - 2022-10-05
+### Changed
+- Restored MQTT Discovery. ([fixes #65](https://github.com/lolouk44/hassio-addons/issues/65))
+- Removed no longer needed MISCALE_VERSION
+
 ## [0.3.3] - 2022-10-03
 ### Changed
 - Restoring handling of V1 scales. ([fixes #64](https://github.com/lolouk44/hassio-addons/issues/64))

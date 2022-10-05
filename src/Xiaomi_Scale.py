@@ -290,6 +290,8 @@ async def main(MISCALE_MAC):
 
         
 if __name__ == "__main__":
+    if MQTT_DISCOVERY:
+        MQTT_discovery()
     sys.stdout.write('-------------------------------------\n')
     sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Initialization Completed, Waiting for Scale...\n")
     try:

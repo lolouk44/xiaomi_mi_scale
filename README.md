@@ -62,7 +62,6 @@ List of options
 Option | Type | Required | Description
 --- | --- | --- | ---
 MISCALE_MAC | string | Yes | Mac address of your scale
-MISCALE_VERSION | int | No | `1` or `2` depending on the version of your scale, defaults to `2`
 MQTT_HOST | string | Yes | MQTT Server (defaults to 127.0.0.1)
 HCI_DEV | string | No | Bluetooth hci device to use. Defaults to hci0
 MQTT_PREFIX | string | No | MQTT Topic Prefix. Defaults to miscale
