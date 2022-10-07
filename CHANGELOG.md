@@ -1,7 +1,7 @@
 ## [0.3.5] - 2022-10-07
 ### Added
 - Added extra logging. Logging Level can be set from config file.
-- Deprecated options MISCALE_VERSION, TIME_INTERVAL
+- Deprecated options MISCALE_VERSION, TIME_INTERVAL.
 
 ## [0.3.4] - 2022-10-05
 ### Changed
