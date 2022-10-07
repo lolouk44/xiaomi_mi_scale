@@ -10,14 +10,14 @@ import json
 import paho.mqtt.publish as publish
 import subprocess
 import sys
+import logging
+import os
 
 import Xiaomi_Scale_Body_Metrics
 
+DEFAULT_DEBUG_LEVEL = "INFO"
+VERSION = "0.3.5"
 
-# First Log msg
-sys.stdout.write(' \n')
-sys.stdout.write('-------------------------------------\n')
-sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Starting Xiaomi mi Scale...\n")
 
 
 # User Config
@@ -47,7 +47,7 @@ def MQTT_discovery():
                         auth={'username':MQTT_USERNAME, 'password':MQTT_PASSWORD},
                         tls=MQTT_TLS
                     )
-    sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - MQTT Discovery Setup Completed...\n")
+    logging.info(f"MQTT Discovery Setup Completed...")
 
 def check_weight(user, weight):
     return weight > user.GT and weight < user.LT
@@ -98,7 +98,7 @@ def MQTT_publish(weight, unit, mitdatetime, hasImpedance, miimpedance):
     message += ',"timestamp":"' + mitdatetime + '"'
     message += '}'
     try:
-        sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Publishing data to topic {MQTT_PREFIX + '/' + name + '/weight'}: {message}\n")
+        logging.info(f"Publishing data to topic {MQTT_PREFIX + '/' + name + '/weight'}: {message}")
         publish.single(
             MQTT_PREFIX + '/' + name + '/weight',
             message,
@@ -108,102 +108,150 @@ def MQTT_publish(weight, unit, mitdatetime, hasImpedance, miimpedance):
             auth={'username':MQTT_USERNAME, 'password':MQTT_PASSWORD},
             tls=MQTT_TLS
         )
-        sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Data Published ...\n\n")
+        logging.info(f"Data Published ...")
     except Exception as error:
-        sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Could not publish to MQTT: {error}\n")
+        logging.error(f"Could not publish to MQTT: {error}")
         raise
 
-
+os.system('clear')
 
 # Configuraiton...
 # Trying To Load Config From options.json (HA Add-On)
 try:
     with open('/data/options.json') as json_file:
-        sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Loading Config From Options.json...\n")
         data = json.load(json_file)["options"]
         try:
-            MISCALE_MAC = data["MISCALE_MAC"]
+            DEBUG_LEVEL = data["DEBUG_LEVEL"]
+            if DEBUG_LEVEL not in ('CRITICAL','ERROR','WARNING','INFO','DEBUG','NOTSET'):
+                DEBUG_LEVEL = DEFAULT_DEBUG_LEVEL
+                logging.basicConfig(format='%(asctime)s - (%(levelname)s) %(message)s', level=DEBUG_LEVEL, datefmt='%Y-%m-%d %H:%M:%S')
+                logging.info(f"-------------------------------------")
+                logging.info(f"Starting Xiaomi mi Scale v{VERSION}...")
+                logging.info(f"Loading Config From Options.json...")
+                logging.warning(f"Invalid logging level provided, defaulting to {DEBUG_LEVEL}...")
+            else:
+                logging.basicConfig(format='%(asctime)s - (%(levelname)s) %(message)s', level=DEBUG_LEVEL, datefmt='%Y-%m-%d %H:%M:%S')
+                logging.info(f"-------------------------------------")
+                logging.info(f"Starting Xiaomi mi Scale v{VERSION}...")
+                logging.info(f"Loading Config From Options.json...")
+                logging.info(f"Logging Level Set to {DEBUG_LEVEL}...")
+            # Prevent bleak log flooding
+            bleak_logger = logging.getLogger("bleak")
+            bleak_logger.setLevel(logging.INFO)
         except:
-            sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - MAC Address not provided...\n")
+            DEBUG_LEVEL = DEFAULT_DEBUG_LEVEL
+            logging.basicConfig(format='%(asctime)s - (%(levelname)s) %(message)s', level=DEBUG_LEVEL, datefmt='%Y-%m-%d %H:%M:%S')
+            logging.info(f"-------------------------------------")
+            logging.info(f"Starting Xiaomi mi Scale v{VERSION}...")
+            logging.info(f"Loading Config From Options.json...")
+            logging.info(f"No Logging Level Provided, Defaulting to  {DEBUG_LEVEL}...")
+            # Prevent bleak log flooding
+            bleak_logger = logging.getLogger("bleak")
+            bleak_logger.setLevel(logging.INFO)
+            pass
+        try:
+            MISCALE_MAC = data["MISCALE_MAC"]
+            logging.debug(f"MISCALE_MAC read from config: {MISCALE_MAC}")
+
+        except:
+            logging.error(f"MAC Address not provided...")
             raise
         try:
             MISCALE_VERSION = data["MISCALE_VERSION"]
-            if(type(MISCALE_VERSION) != int):
-                sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - [Warning] Converting MISCALE_VERSION to integer...\n")
-                MISCALE_VERSION = int(MISCALE_VERSION)
+            logging.info(f"MISCALE_VERSION option is deprecated and can safely be removed from config...")
         except:
-            MISCALE_VERSION = 2
             pass
         try:
             MQTT_USERNAME = data["MQTT_USERNAME"]
+            logging.debug(f"MQTT_USERNAME read from config: {MQTT_USERNAME}")
         except:
             MQTT_USERNAME = "username"
+            logging.debug(f"MQTT_USERNAME defaulted to: {MQTT_USERNAME}")
             pass
         try:
             MQTT_PASSWORD = data["MQTT_PASSWORD"]
+            logging.debug(f"MQTT_PASSWORD read from config: ***")
         except:
             MQTT_PASSWORD = None
+            logging.debug(f"MQTT_PASSWORD defaulted to: {MQTT_PASSWORD}")
             pass
         try:
             MQTT_HOST = data["MQTT_HOST"]
+            logging.debug(f"MQTT_HOST read from config: {MQTT_HOST}")
         except:
-            sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - MQTT Host not provided...\n")
+            logging.error(f"MQTT Host not provided...")
             raise
         try:
             MQTT_RETAIN = data["MQTT_RETAIN"]
+            logging.debug(f"MQTT_RETAIN read from config: {MQTT_RETAIN}")
         except:
             MQTT_RETAIN = True
+            logging.debug(f"MQTT_RETAIN defaulted to: {MQTT_RETAIN}")
             pass
         try:
             MQTT_PORT = data["MQTT_PORT"]
+            logging.debug(f"MQTT_PORT read from config: {MQTT_PORT}")
             if(type(MQTT_PORT) != int):
-                sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - [Warning] Converting MQTT_PORT to integer...\n")
+                logging.warning(f"Converting MQTT_PORT to integer...")
                 MQTT_PORT = int(MQTT_PORT)
         except:
             MQTT_PORT = 1883
+            logging.debug(f"MQTT_PORT defaulted to: {MQTT_PORT}")
             pass
         try:
             MQTT_TLS_CACERTS = data["MQTT_TLS_CACERTS"]
+            logging.debug(f"MQTT_TLS_CACERTS read from config: {MQTT_TLS_CACERTS}")
         except:
             MQTT_TLS_CACERTS = None
+            logging.debug(f"MQTT_TLS_CACERTS defaulted to: {MQTT_TLS_CACERTS}")
             pass
         try:
             MQTT_TLS_INSECURE = data["MQTT_TLS_INSECURE"]
+            logging.debug(f"MQTT_TLS_INSECURE read from config: {MQTT_TLS_INSECURE}")
         except:
             MQTT_TLS_INSECURE = None
+            logging.debug(f"MQTT_TLS_INSECURE defaulted to: {MQTT_TLS_INSECURE}")
             pass
         try:
             MQTT_PREFIX = data["MQTT_PREFIX"]
+            logging.debug(f"MQTT_PREFIX read from config: {MQTT_PREFIX}")
         except:
             MQTT_PREFIX = "miscale"
+            logging.debug(f"MQTT_PREFIX defaulted to: {MQTT_PREFIX}")
             pass
         try:
             TIME_INTERVAL = data["TIME_INTERVAL"]
-            if(type(TIME_INTERVAL) != int):
-                sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - [Warning] Converting TIME_INTERVAL to integer...\n")
-                TIME_INTERVAL = int(TIME_INTERVAL)
+            logging.info(f"TIME_INTERVAL option is deprecated and can safely be removed from config...")
         except:
-            TIME_INTERVAL = 30
             pass
         try:
             MQTT_DISCOVERY = data["MQTT_DISCOVERY"]
+            logging.debug(f"MQTT_DISCOVERY read from config: {MQTT_DISCOVERY}")
         except:
             MQTT_DISCOVERY = True
+            logging.debug(f"MQTT_DISCOVERY defaulted to: {MQTT_DISCOVERY}")
             pass
         try:
             MQTT_DISCOVERY_PREFIX = data["MQTT_DISCOVERY_PREFIX"]
+            logging.debug(f"MQTT_DISCOVERY_PREFIX read from config: {MQTT_DISCOVERY_PREFIX}")
         except:
-            MQTT_DISCOVERY_PREFIX = "homeassistant"
+            if MQTT_DISCOVERY:
+                logging.warning(f"MQTT Discovery enabled but no MQTT Prefix provided, defaulting to 'homeassistant'...")
+                MQTT_DISCOVERY_PREFIX = "homeassistant"
             pass
         try:
             HCI_DEV = data["HCI_DEV"][-1]
+            logging.debug(f"HCI_DEV read from config: {HCI_DEV}")
         except:
-            HCI_DEV = "hci0"[-1]
+            HCI_DEV = "hci0"
+            logging.debug(f"HCI_DEV defaulted to: {HCI_DEV}")
             pass
         try:
             BLUEPY_PASSIVE_SCAN = data["BLUEPY_PASSIVE_SCAN"]
+            logging.debug(f"BLUEPY_PASSIVE_SCAN read from config: {BLUEPY_PASSIVE_SCAN}")
         except:
             BLUEPY_PASSIVE_SCAN = False
+            logging.debug(f"BLUEPY_PASSIVE_SCAN defaulted to: {BLUEPY_PASSIVE_SCAN}")
             pass
 
         if MQTT_TLS_CACERTS in [None, '', 'Path to CA Cert File']:
@@ -220,15 +268,24 @@ try:
                     raise ValueError("GT can not be larger than LT - user {user.Name}")  
                 USERS.append(user)
             except:
-                sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - {sys.exc_info()[1]}\n")
+                logging.error(f"{sys.exc_info()[1]}")
                 raise
         OLD_MEASURE = None
-        sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Config Loaded...\n")
+        logging.info(f"Config Loaded...")
 
 # Failed to open options.json
 except FileNotFoundError as error:
-    sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - options.json file missing... {error}\n")
+    DEBUG_LEVEL = DEFAULT_DEBUG_LEVEL
+    logging.basicConfig(format='%(asctime)s - (%(levelname)s) %(message)s', level=DEBUG_LEVEL, datefmt='%Y-%m-%d %H:%M:%S')
+    logging.info(f"-------------------------------------")
+    logging.info(f"Starting Xiaomi mi Scale v{VERSION}...")
+    logging.info(f"Loading Config From Options.json...")
+    logging.error(f"options.json file missing... {error}")
+    # Prevent bleak log flooding
+    bleak_logger = logging.getLogger("bleak")
+    bleak_logger.setLevel(logging.INFO)
     raise
+
 
 async def main(MISCALE_MAC):
     stop_event = asyncio.Event()
@@ -238,15 +295,11 @@ async def main(MISCALE_MAC):
     def callback(device, advertising_data):
         global OLD_MEASURE
         if device.address.lower() == MISCALE_MAC:
-            #print(f"miscale found, with advertising_data: {advertising_data}")
-            try:
-                device_name = advertising_data.local_name
-            except:
-                device_name = None
-                pass
+            logging.debug(f"miscale found, with advertising_data: {advertising_data}")
             try:
                 ### Xiaomi V2 Scale ###
                 data = binascii.b2a_hex(advertising_data.service_data['0000181b-0000-1000-8000-00805f9b34fb']).decode('ascii')
+                logging.debug(f"miscale v2 found (service data: 0000181b-0000-1000-8000-00805f9b34fb)")
                 data = "1b18" + data # Remnant from previous code. Needs to be cleaned in the future
                 data2 = bytes.fromhex(data[4:])
                 ctrlByte1 = data2[1]
@@ -267,6 +320,7 @@ async def main(MISCALE_MAC):
             try:
                 ### Xiaomi V1 Scale ###
                 data = binascii.b2a_hex(advertising_data.service_data['0000181d-0000-1000-8000-00805f9b34fb']).decode('ascii')
+                logging.debug(f"miscale v1 found (service data: 0000181d-0000-1000-8000-00805f9b34fb)")
                 data = "1d18" + data # Remnant from previous code. Needs to be cleaned in the future
                 measunit = data[4:6]
                 measured = int((data[8:10] + data[6:8]), 16) * 0.01
@@ -292,8 +346,8 @@ async def main(MISCALE_MAC):
 if __name__ == "__main__":
     if MQTT_DISCOVERY:
         MQTT_discovery()
-    sys.stdout.write('-------------------------------------\n')
-    sys.stdout.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Initialization Completed, Waiting for Scale...\n")
+    logging.info(f"-------------------------------------")
+    logging.info(f"Initialization Completed, Waiting for Scale...")
     try:
         asyncio.run(main(MISCALE_MAC.lower()))
     except:

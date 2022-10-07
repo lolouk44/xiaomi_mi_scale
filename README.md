@@ -73,7 +73,7 @@ MQTT_DISCOVERY_PREFIX | string | No | MQTT Discovery Prefix for Home Assistant. 
 MQTT_TLS_CACERTS | string | No | MQTT TLS connection: directory with CA certificate(s) that signed MQTT Server's TLS certificate, defaults to None (= no TLS connection)
 MQTT_TLS_INSECURE | bool | No | MQTT TLS connection: don't verify hostname in TLS certificate, defaults to None (= always check hostname)
 BLUEPY_PASSIVE_SCAN | bool | No | Try to set to true if getting an error like `Bluetooth connection error: Failed to execute management command ‘le on’` on a Raspberry Pi. Defaults to false
-TIME_INTERVAL | int | No | Time in sec between each query to the scale, to allow other applications to use the Bluetooth module. Defaults to 30
+DEBUG_LEVEL | string | No | Logging level. Possible values: 'CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG'. Defaults to 'INFO'.
 USERS | List | Yes | List of users to add
 
 Auto-gender selection/config -- This is used to create the calculations such as BMI, Water/Bone Mass etc...
