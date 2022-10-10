@@ -1,7 +1,9 @@
-## [0.3.5] - 2022-10-07
+## [0.3.5] - 2022-10-10
 ### Added
 - Added extra logging. Logging Level can be set from config file.
 - Deprecated options MISCALE_VERSION, TIME_INTERVAL.
+### Changed
+- Restored HCI Settings
 
 ## [0.3.4] - 2022-10-05
 ### Changed

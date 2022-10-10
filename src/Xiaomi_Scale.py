@@ -240,7 +240,7 @@ try:
                 MQTT_DISCOVERY_PREFIX = "homeassistant"
             pass
         try:
-            HCI_DEV = data["HCI_DEV"][-1]
+            HCI_DEV = data["HCI_DEV"].lower()
             logging.debug(f"HCI_DEV read from config: {HCI_DEV}")
         except:
             HCI_DEV = "hci0"
@@ -336,7 +336,10 @@ async def main(MISCALE_MAC):
                 pass
         pass
 
-    async with BleakScanner(callback) as scanner:
+    async with BleakScanner(
+        callback,
+        device=f"{HCI_DEV}"
+        ) as scanner:
         ...
         # Important! Wait for an event to trigger stop, otherwise scanner
         # will stop immediately.
@@ -350,5 +353,6 @@ if __name__ == "__main__":
     logging.info(f"Initialization Completed, Waiting for Scale...")
     try:
         asyncio.run(main(MISCALE_MAC.lower()))
-    except:
+    except Exception as error:
+        logging.error(f"Unable to connect to Bluetooth: {error}")
         pass
