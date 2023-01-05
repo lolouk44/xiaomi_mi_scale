@@ -84,7 +84,7 @@ def MQTT_publish(weight, unit, mitdatetime, hasImpedance, miimpedance):
 
     if hasImpedance:
         lib = Xiaomi_Scale_Body_Metrics.bodyMetrics(calcweight, height, age, sex, int(miimpedance))
-        bodyscale = ['Obese', 'Overweight', 'Thick-set', 'Lack-exerscise', 'Balanced', 'Balanced-muscular', 'Skinny', 'Balanced-skinny', 'Skinny-muscular']
+        bodyscale = ['Obese', 'Overweight', 'Thick-set', 'Lack-exercise', 'Balanced', 'Balanced-muscular', 'Skinny', 'Balanced-skinny', 'Skinny-muscular']
         message += ',"lean_body_mass":' + "{:.2f}".format(lib.getLBMCoefficient())
         message += ',"body_fat":' + "{:.2f}".format(lib.getFatPercentage())
         message += ',"water":' + "{:.2f}".format(lib.getWaterPercentage())
